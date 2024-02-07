@@ -2,6 +2,7 @@
   "name": "frontend-workshop",
   "private": true,
   "workspaces":[
-  	"examples/remix-todo"
+  	"examples/remix-todo",
+	  "web"
   ]
 }
