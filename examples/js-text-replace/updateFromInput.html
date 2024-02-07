@@ -1,0 +1,18 @@
+
+<p id="textToReplace">Current Text</p>
+
+<input id="inputSource" type="text" oninput="updateText()">
+
+
+<script>
+
+    function updateText(){
+        const input = document.getElementById("inputSource")
+        const newText = input.value
+
+        const el = document.getElementById("textToReplace")
+        el.innerText = newText
+
+    }
+
+</script>

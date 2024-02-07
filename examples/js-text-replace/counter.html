@@ -1,0 +1,11 @@
+<p>count: <span id="count">0</span></p>
+
+<button onclick="increment()">increment</button>
+
+<script>
+    let count = 0
+    function increment(){
+        count++
+        document.getElementById("count").innerText = count
+    }
+</script>

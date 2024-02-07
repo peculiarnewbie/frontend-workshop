@@ -1,0 +1,17 @@
+<ul id="list"></ul>
+<input id="inputSource" type="text" >
+<button onclick="addToList()">Add</button>
+
+<script>
+    function addToList(){
+        const inputEl = document.getElementById("inputSource")
+        const listParent = document.getElementById("list")
+
+        const el = document.createElement("li")
+        el.innerText = inputEl.value 
+
+        listParent.appendChild(el)
+
+        inputEl.value = ""
+    }
+</script>

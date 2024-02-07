@@ -1,0 +1,14 @@
+
+<p id="textToReplace">Current Text</p>
+
+<button onclick="replaceText()">Replace</button>
+
+
+<script>
+    function replaceText(){
+        const el = document.getElementById("textToReplace")
+        el.innerText = "New Text"
+        console.log(el)
+    }
+
+</script>
