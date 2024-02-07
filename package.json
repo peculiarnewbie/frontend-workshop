@@ -1,0 +1,7 @@
+{
+  "name": "frontend-workshop",
+  "private": true,
+  "workspaces":[
+  	"examples/remix-todo"
+  ]
+}
