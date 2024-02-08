@@ -29,7 +29,7 @@ export default function Index() {
 			<div
 				className={`bg-white dark:bg-black dark:text-slate-200 h-full w-full min-h-screen`}
 			>
-				<Header toggleDarkTheme={() => setDarkTheme(!darkTheme)} />
+				<Header darkTheme={darkTheme} setDarkTheme={setDarkTheme} />
 			</div>
 		</div>
 	);
