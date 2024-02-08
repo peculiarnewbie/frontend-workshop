@@ -3,6 +3,7 @@ import type { LinksFunction } from "@remix-run/cloudflare";
 
 import styles from "../app.css";
 import { useState } from "react";
+import Header from "./Header";
 
 export const links: LinksFunction = () => [{ rel: "stylesheet", href: styles }];
 
@@ -13,8 +14,14 @@ export const meta: MetaFunction = () => {
 	];
 };
 
+export type Task = {
+	index: number;
+	item: string;
+	done: boolean;
+};
+
 export default function Index() {
-	const [tasks, setTasks] = useState([]);
+	const [tasks, setTasks] = useState<Task[]>([]);
 	const [darkTheme, setDarkTheme] = useState(true);
 
 	return (
@@ -22,15 +29,7 @@ export default function Index() {
 			<div
 				className={`bg-white dark:bg-black dark:text-slate-200 h-full w-full min-h-screen`}
 			>
-				<header className=" flex justify-center">
-					<div className="container flex justify-between">
-						<p>logo</p>
-						<div className="flex">
-							<nav>hi</nav>
-							<nav>hey</nav>
-						</div>
-					</div>
-				</header>
+				<Header toggleDarkTheme={() => setDarkTheme(!darkTheme)} />
 			</div>
 		</div>
 	);
