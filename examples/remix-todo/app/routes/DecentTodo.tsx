@@ -8,7 +8,7 @@ function DecentTodo({
 	updateTasks: (newTasks: Task[]) => void;
 }) {
 	return (
-		<div className="h-full w-full bg-emerald-400 dark:bg-emerald-800">
+		<div className="h-full w-full bg-blue">
 			<div>good</div>
 			<div className="flex flex-col">
 				{tasks.map((task) => {

@@ -22,7 +22,7 @@ function Header({
 	};
 
 	return (
-		<header className=" flex justify-center bg-slate-600 h-14 items-center">
+		<header className=" flex justify-center bg-ctp-crust h-14 items-center">
 			<div className="container flex justify-between">
 				<p>logo</p>
 				<div className="flex gap-4">

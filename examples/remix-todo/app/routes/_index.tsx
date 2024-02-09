@@ -33,9 +33,9 @@ export default function Index() {
 	};
 
 	return (
-		<div className={`${darkTheme ? "dark" : ""}`}>
+		<div className={`${darkTheme ? "ctp-mocha dark" : "ctp-latte"}`}>
 			<div
-				className={`flex flex-col bg-neutral-200 dark:bg-neutral-800 dark:text-slate-200 h-screen w-full `}
+				className={`flex flex-col h-screen w-full bg-ctp-base text-ctp-text`}
 			>
 				<Header darkTheme={darkTheme} setDarkTheme={setDarkTheme} />
 				<div className="h-full flex flex-col">
@@ -56,6 +56,21 @@ export default function Index() {
 					</div>
 
 					<div className=" h-1/6 max-h-24" />
+				</div>
+			</div>
+			<div>
+				<div className="bg-ctp-base">base</div>
+
+				<div className=" bg-ctp-surface0">surface0</div>
+				<div className=" bg-ctp-surface1">surface1</div>
+				<div className=" bg-ctp-surface2">surface2</div>
+				<div className=" bg-ctp-mantle">mantle</div>
+				<div className=" bg-ctp-crust">crust</div>
+				<div className=" bg-ctp-surface2 text-ctp-overlay2">
+					overlay2
+				</div>
+				<div className=" bg-ctp-surface2 text-ctp-overlay0">
+					overlay0
 				</div>
 			</div>
 		</div>

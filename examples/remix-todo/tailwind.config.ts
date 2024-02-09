@@ -5,6 +5,10 @@ export default {
 	theme: {
 		extend: {},
 	},
-	plugins: [],
+	plugins: [
+		require("@catppuccin/tailwindcss")({
+			prefix: "ctp",
+		}),
+	],
 	darkMode: "class",
 } satisfies Config;
