@@ -25,14 +25,15 @@ function ElaborateTodo({
 		setInputTask(value);
 	};
 
+	const handleAddTask = () => {};
+
 	const addTask = (e: FormEvent) => {
 		e.preventDefault();
 		const newTasks = [...tasks];
 		newTasks.push({ item: inputTask, done: false });
 		updateTasks(newTasks);
 
-		//@ts-expect-error
-		inputRef.current.value = "";
+		if (!features.clearOnSubmit) return;
 		setInputTask("");
 	};
 
@@ -89,7 +90,13 @@ function ElaborateTodo({
 			<div className=" bg-ctp-surface1 flex flex-col items-center p-6">
 				<p className=" text-4xl font-bold">{complexity}</p>
 				<div className=" p-2" />
-				<form
+				<TaskInput
+					addTask={addTask}
+					isForm={features.enterToSubmit}
+					updateInput={updateInput}
+					inputTask={inputTask}
+				/>
+				{/* <form
 					onSubmit={addTask}
 					className="ctp-latte flex gap-4 w-full max-w-96"
 				>
@@ -105,7 +112,7 @@ function ElaborateTodo({
 					>
 						{plus}
 					</button>
-				</form>
+				</form> */}
 			</div>
 			<div className="flex flex-col flex-1 overflow-auto items-center gap-4 p-6 relative">
 				{tasks.map((task, i) => {
@@ -143,3 +150,53 @@ function ElaborateTodo({
 }
 
 export default ElaborateTodo;
+
+function TaskInput({
+	addTask,
+	isForm,
+	updateInput,
+	inputTask,
+}: {
+	addTask: (e: FormEvent) => void;
+	isForm: boolean;
+	updateInput: (e: ChangeEvent) => void;
+	inputTask: string;
+}) {
+	if (isForm)
+		return (
+			<form
+				onSubmit={addTask}
+				className="ctp-latte flex gap-4 w-full max-w-96"
+			>
+				<input
+					className=" bg-ctp-base text-ctp-text rounded-md p-2 outline-ctp-blue outline-offset-1 font-semibold w-full"
+					type="text"
+					onChange={updateInput}
+					value={inputTask}
+				/>
+				<button
+					className=" text-3xl font-bold bg-ctp-blue text-white outline-ctp-yellow rounded-full aspect-square h-10 align-text-top flex justify-center items-center"
+					type="submit"
+				>
+					{plus}
+				</button>
+			</form>
+		);
+	else
+		return (
+			<div className="ctp-latte flex gap-4 w-full max-w-96">
+				<input
+					className=" bg-ctp-base text-ctp-text rounded-md p-2 outline-ctp-blue outline-offset-1 font-semibold w-full"
+					type="text"
+					onChange={updateInput}
+					value={inputTask}
+				/>
+				<button
+					className=" text-3xl font-bold bg-ctp-blue text-white outline-ctp-yellow rounded-full aspect-square h-10 align-text-top flex justify-center items-center"
+					onClick={addTask}
+				>
+					{plus}
+				</button>
+			</div>
+		);
+}
