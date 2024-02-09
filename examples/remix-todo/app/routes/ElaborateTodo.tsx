@@ -25,16 +25,22 @@ function ElaborateTodo({
 		setInputTask(value);
 	};
 
-	const handleAddTask = () => {};
-
 	const addTask = (e: FormEvent) => {
 		e.preventDefault();
+
+		if (features.validateEmpty) {
+			if (inputTask == "") {
+				//@ts-expect-error
+				inputRef.current.focus();
+				return;
+			}
+		}
+
 		const newTasks = [...tasks];
 		newTasks.push({ item: inputTask, done: false });
 		updateTasks(newTasks);
 
-		if (!features.clearOnSubmit) return;
-		setInputTask("");
+		if (features.clearOnSubmit) setInputTask("");
 	};
 
 	const deleteTask = (index: number) => {
@@ -95,6 +101,7 @@ function ElaborateTodo({
 					isForm={features.enterToSubmit}
 					updateInput={updateInput}
 					inputTask={inputTask}
+					inputRef={inputRef}
 				/>
 				{/* <form
 					onSubmit={addTask}
@@ -156,11 +163,13 @@ function TaskInput({
 	isForm,
 	updateInput,
 	inputTask,
+	inputRef,
 }: {
 	addTask: (e: FormEvent) => void;
 	isForm: boolean;
 	updateInput: (e: ChangeEvent) => void;
 	inputTask: string;
+	inputRef: React.MutableRefObject<null>;
 }) {
 	if (isForm)
 		return (
@@ -173,6 +182,7 @@ function TaskInput({
 					type="text"
 					onChange={updateInput}
 					value={inputTask}
+					ref={inputRef}
 				/>
 				<button
 					className=" text-3xl font-bold bg-ctp-blue text-white outline-ctp-yellow rounded-full aspect-square h-10 align-text-top flex justify-center items-center"
@@ -190,6 +200,7 @@ function TaskInput({
 					type="text"
 					onChange={updateInput}
 					value={inputTask}
+					ref={inputRef}
 				/>
 				<button
 					className=" text-3xl font-bold bg-ctp-blue text-white outline-ctp-yellow rounded-full aspect-square h-10 align-text-top flex justify-center items-center"
