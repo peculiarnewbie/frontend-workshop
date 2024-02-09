@@ -5,7 +5,7 @@ import styles from "../app.css";
 import { useState } from "react";
 import Header from "./Header";
 import BasicTodo from "./BasicTodo";
-import DecentTodo from "./DecentTodo";
+import ElaborateTodo from "./ElaborateTodo";
 
 export const links: LinksFunction = () => [{ rel: "stylesheet", href: styles }];
 
@@ -42,8 +42,11 @@ export default function Index() {
 					<div className="flex flex-col h-[70vh] w-full bg-ctp-surface2 border-ctp-yellow border-2 rounded-xl overflow-clip shadow-lg max-w-[600px] min-w-80 min-h-96">
 						<BasicTodo tasks={tasks} updateTasks={updateTasks} />
 					</div>
-					<div className="flex flex-col h-[70vh] w-full bg-ctp-surface2 border-ctp-yellow border-2 rounded-xl overflow-clip shadow-lg max-w-[600px] min-w-80 min-h-96">
-						<DecentTodo tasks={tasks} updateTasks={updateTasks} />
+					<div className="flex flex-col h-[70vh] w-full bg-ctp-surface2 border-ctp-blue border-2 rounded-xl overflow-clip shadow-lg max-w-[600px] min-w-80 min-h-96">
+						<ElaborateTodo
+							tasks={tasks}
+							updateTasks={updateTasks}
+						/>
 					</div>
 				</div>
 			</div>

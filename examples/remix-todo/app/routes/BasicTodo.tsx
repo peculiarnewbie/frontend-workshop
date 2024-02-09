@@ -1,5 +1,6 @@
 import { ChangeEvent, MouseEvent, useState } from "react";
 import { Task } from "./_index";
+import { plus, trash } from "./icons";
 
 function BasicTodo({
 	tasks,
@@ -39,10 +40,10 @@ function BasicTodo({
 						onChange={updateInput}
 					/>
 					<button
-						className=" text-3xl font-bold bg-ctp-yellow text-white outline-ctp-yellow rounded-full aspect-square h-10 align-text-top"
+						className=" text-3xl font-bold bg-ctp-yellow text-white outline-ctp-yellow rounded-full aspect-square h-10 align-text-top flex justify-center items-center"
 						onClick={addTask}
 					>
-						+
+						{plus}
 					</button>
 				</div>
 			</div>
@@ -53,7 +54,7 @@ function BasicTodo({
 							<div>{task.item}</div>
 							<div>
 								<button onClick={() => deleteTask(i)}>
-									del
+									{trash}
 								</button>
 							</div>
 						</div>
