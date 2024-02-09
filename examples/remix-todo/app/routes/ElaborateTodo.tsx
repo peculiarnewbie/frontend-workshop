@@ -10,6 +10,7 @@ function ElaborateTodo({
 	updateTasks: (newTasks: Task[]) => void;
 }) {
 	const [inputTask, setInputTask] = useState("");
+	const [feautresMenu, setFeautresMenu] = useState(false);
 	const [features, setFeatures] = useState({
 		enterToSubmit: true,
 		clearOnSubmit: true,
@@ -134,22 +135,44 @@ function ElaborateTodo({
 						</div>
 					);
 				})}
-				<div className="absolute bottom-0 p-4 bg-ctp-base w-full h-fit rounded-t-xl flex gap-2 transition-all duration-200 flex-wrap justify-center">
-					{Object.keys(features).map((feature) => {
-						return (
+				<div
+					className={`absolute bottom-0 w-full transition-all ${
+						feautresMenu ? "h-24" : "h-0"
+					}`}
+				>
+					<div className="relative w-full h-full flex flex-col">
+						<div className="absolute w-full flex justify-center -top-6">
 							<button
-								className={`p-2 ctp-latte text-ctp-text rounded-md border-2 duration-75 transition-all w-24 ${
-									//@ts-expect-error
-									features[`${feature}`]
-										? " bg-ctp-blue font-semibold text-white  border-white"
-										: "bg-ctp-surface1 border-transparent"
-								}`}
-								onClick={() => toggleFeature(feature)}
+								className=" mx-auto"
+								onClick={() => setFeautresMenu(!feautresMenu)}
 							>
-								{camelToNormal(feature)}
+								{feautresMenu ? "close" : "open"}
 							</button>
-						);
-					})}
+						</div>
+						<div className=" w-full rounded-t-xl flex-1 h-0 overflow-hidden">
+							<div className="p-4 bg-ctp-surface1 w-full overflow-auto h-full flex justify-between">
+								<div className="w-fit flex gap-2 flex-nowrap justify-between flex-1 h-full text-sm md:text-base">
+									{Object.keys(features).map((feature) => {
+										return (
+											<button
+												className={`p-2 text-ctp-text rounded-md border-2 duration-200 transition-all w-24 ${
+													//@ts-expect-error
+													features[`${feature}`]
+														? " bg-ctp-blue font-semibold text-white border-white ctp-latte"
+														: "bg-ctp-surface2 border-transparent"
+												}`}
+												onClick={() =>
+													toggleFeature(feature)
+												}
+											>
+												{camelToNormal(feature)}
+											</button>
+										);
+									})}
+								</div>
+							</div>
+						</div>
+					</div>
 				</div>
 			</div>
 		</>
