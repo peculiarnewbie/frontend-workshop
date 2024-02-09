@@ -21,14 +21,20 @@ function BasicTodo({
 		updateTasks(newTasks);
 	};
 
+	const deleteTask = (index: number) => {
+		const newTasks = [...tasks];
+		newTasks.splice(index, 1);
+		updateTasks(newTasks);
+	};
+
 	return (
-		<div className="h-full w-full bg-ctp-surface2 border-ctp-yellow border-2 rounded-xl overflow-clip shadow-lg">
+		<>
 			<div className=" bg-ctp-surface1 flex flex-col items-center p-6">
 				<p className=" text-4xl font-bold">Basic</p>
 				<div className=" p-2" />
-				<div className="ctp-latte flex gap-4">
+				<div className="ctp-latte flex gap-4 w-full max-w-96">
 					<input
-						className=" bg-ctp-base text-ctp-text rounded-md p-2 outline-ctp-yellow outline-offset-1 font-semibold"
+						className=" bg-ctp-base text-ctp-text rounded-md p-2 outline-ctp-yellow outline-offset-1 font-semibold w-full"
 						type="text"
 						onChange={updateInput}
 					/>
@@ -40,19 +46,21 @@ function BasicTodo({
 					</button>
 				</div>
 			</div>
-			<div className="flex flex-col items-center gap-4 p-6">
-				{tasks.map((task) => {
+			<div className="flex flex-col flex-1 overflow-auto items-center gap-4 p-6 ">
+				{tasks.map((task, i) => {
 					return (
 						<div className=" p-3 rounded-md bg-ctp-base font-semibold text-lg shadow-md w-full flex justify-between">
 							<div>{task.item}</div>
 							<div>
-								<button>del</button>
+								<button onClick={() => deleteTask(i)}>
+									del
+								</button>
 							</div>
 						</div>
 					);
 				})}
 			</div>
-		</div>
+		</>
 	);
 }
 

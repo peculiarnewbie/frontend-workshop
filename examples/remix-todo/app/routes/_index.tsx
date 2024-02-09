@@ -35,42 +35,16 @@ export default function Index() {
 	return (
 		<div className={`${darkTheme ? "ctp-mocha dark" : "ctp-latte"}`}>
 			<div
-				className={`flex flex-col h-screen w-full bg-ctp-base text-ctp-text`}
+				className={`flex flex-col min-h-screen w-full bg-ctp-base text-ctp-text overflow-auto`}
 			>
 				<Header darkTheme={darkTheme} setDarkTheme={setDarkTheme} />
-				<div className="h-full flex flex-col">
-					<div className=" h-1/6 max-h-24" />
-					<div className="h-full flex flex-col lg:flex-row">
-						<div className="px-20 w-full">
-							<BasicTodo
-								tasks={tasks}
-								updateTasks={updateTasks}
-							/>
-						</div>
-						<div className="px-20 w-full">
-							<DecentTodo
-								tasks={tasks}
-								updateTasks={updateTasks}
-							/>
-						</div>
+				<div className=" h-full flex flex-1 flex-col lg:flex-row w-full items-center p-12 justify-start sm:justify-center self-center place-self-center justify-self-center gap-12 lg:gap-24">
+					<div className="flex flex-col h-[70vh] w-full bg-ctp-surface2 border-ctp-yellow border-2 rounded-xl overflow-clip shadow-lg max-w-[600px] min-w-80 min-h-96">
+						<BasicTodo tasks={tasks} updateTasks={updateTasks} />
 					</div>
-
-					<div className=" h-1/6 max-h-24" />
-				</div>
-			</div>
-			<div>
-				<div className="bg-ctp-base">base</div>
-
-				<div className=" bg-ctp-surface0">surface0</div>
-				<div className=" bg-ctp-surface1">surface1</div>
-				<div className=" bg-ctp-surface2">surface2</div>
-				<div className=" bg-ctp-mantle">mantle</div>
-				<div className=" bg-ctp-crust">crust</div>
-				<div className=" bg-ctp-surface2 text-ctp-overlay2">
-					overlay2
-				</div>
-				<div className=" bg-ctp-surface2 text-ctp-overlay0">
-					overlay0
+					<div className="flex flex-col h-[70vh] w-full bg-ctp-surface2 border-ctp-yellow border-2 rounded-xl overflow-clip shadow-lg max-w-[600px] min-w-80 min-h-96">
+						<DecentTodo tasks={tasks} updateTasks={updateTasks} />
+					</div>
 				</div>
 			</div>
 		</div>
