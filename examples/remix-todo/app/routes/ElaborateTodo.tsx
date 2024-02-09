@@ -1,4 +1,4 @@
-import { ChangeEvent, FormEvent, useRef, useState } from "react";
+import { ChangeEvent, FormEvent, useEffect, useRef, useState } from "react";
 import { Task } from "./_index";
 import { plus, trash } from "./icons";
 
@@ -17,6 +17,7 @@ function ElaborateTodo({
 		reorderOnDrag: true,
 		clickToEdit: true,
 	});
+	const [complexity, setComplexity] = useState("Elaborate");
 	const inputRef = useRef(null);
 
 	const updateInput = (e: ChangeEvent) => {
@@ -54,10 +55,39 @@ function ElaborateTodo({
 			.toLowerCase();
 	};
 
+	const calculateComplexity = () => {
+		let featureCount = 0;
+		const array = Object.entries(features);
+		for (let i = 0; i < array.length; i++) {
+			const [item, value] = array[i];
+			if (value) featureCount++;
+		}
+
+		switch (featureCount) {
+			case 0:
+				setComplexity("Basically Basic");
+				break;
+			case 1:
+			case 2:
+				setComplexity("Simple");
+				break;
+			case 3:
+			case 4:
+				setComplexity("Decent");
+				break;
+			case 5:
+				setComplexity("Elaborate");
+		}
+	};
+
+	useEffect(() => {
+		calculateComplexity();
+	}, [features]);
+
 	return (
 		<>
 			<div className=" bg-ctp-surface1 flex flex-col items-center p-6">
-				<p className=" text-4xl font-bold">Elaborate</p>
+				<p className=" text-4xl font-bold">{complexity}</p>
 				<div className=" p-2" />
 				<form
 					onSubmit={addTask}
@@ -90,15 +120,15 @@ function ElaborateTodo({
 						</div>
 					);
 				})}
-				<div className="absolute bottom-0 p-4 bg-ctp-base w-full h-24 rounded-t-xl flex gap-2 transition-all duration-200 flex-wrap justify-center">
+				<div className="absolute bottom-0 p-4 bg-ctp-base w-full h-fit rounded-t-xl flex gap-2 transition-all duration-200 flex-wrap justify-center">
 					{Object.keys(features).map((feature) => {
 						return (
 							<button
-								className={`p-2 ctp-latte text-ctp-text rounded-md duration-75 transition-all w-24 ${
+								className={`p-2 ctp-latte text-ctp-text rounded-md border-2 duration-75 transition-all w-24 ${
 									//@ts-expect-error
 									features[`${feature}`]
-										? " bg-ctp-blue font-semibold text-white border-2 border-white"
-										: "bg-ctp-surface1 "
+										? " bg-ctp-blue font-semibold text-white  border-white"
+										: "bg-ctp-surface1 border-transparent"
 								}`}
 								onClick={() => toggleFeature(feature)}
 							>
