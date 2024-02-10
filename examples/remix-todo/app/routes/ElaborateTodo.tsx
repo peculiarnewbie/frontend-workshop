@@ -2,6 +2,21 @@ import { ChangeEvent, FormEvent, useEffect, useRef, useState } from "react";
 import { Task } from "./_index";
 import { plus, trash, upArrow } from "./icons";
 
+type Feature = {
+	name: string;
+	active: boolean;
+	description?: string;
+	subFeatures?: Feature[];
+};
+
+const FeatureKeys = {
+	enterToSubmit: 0,
+	clearOnSubmit: 1,
+	validateEmpty: 2,
+	editableTasks: 3,
+	reorderOnDrag: 4,
+};
+
 function ElaborateTodo({
 	tasks,
 	setTasks,
@@ -10,14 +25,44 @@ function ElaborateTodo({
 	setTasks: (newTasks: Task[]) => void;
 }) {
 	const [inputTask, setInputTask] = useState("");
-	const [featuresMenu, setFeaturesMenu] = useState(false);
-	const [features, setFeatures] = useState({
-		enterToSubmit: true,
-		clearOnSubmit: true,
-		validateEmpty: true,
-		reorderOnDrag: true,
-		clickToEdit: true,
-	});
+	const [featuresMenu, setFeaturesMenu] = useState(true);
+	const [features, setFeatures] = useState<Feature[]>([
+		{
+			name: "enter to submit",
+			active: true,
+			description: "press enter on the input to add task",
+		},
+		{
+			name: "clear on submit",
+			active: true,
+			description: "the input field will clear after adding tasks",
+		},
+		{
+			name: "validate empty",
+			active: true,
+			description:
+				"focus on input if you press add task while the field is empty",
+		},
+		{
+			name: "editable tasks",
+			active: true,
+			description: "click the task to edit tasks",
+			subFeatures: [
+				{
+					name: "update on blur",
+					active: true,
+				},
+				{
+					name: "prevent unintended click",
+					active: true,
+				},
+			],
+		},
+		{
+			name: "reorder on drag",
+			active: true,
+		},
+	]);
 	const [complexity, setComplexity] = useState("Elaborate");
 	const inputRef = useRef(null);
 
@@ -29,7 +74,7 @@ function ElaborateTodo({
 	const addTask = (e: FormEvent) => {
 		e.preventDefault();
 
-		if (features.validateEmpty) {
+		if (features[FeatureKeys.validateEmpty].active) {
 			if (inputTask == "") {
 				//@ts-expect-error
 				inputRef.current.focus();
@@ -41,7 +86,7 @@ function ElaborateTodo({
 		newTasks.push({ item: inputTask, done: false });
 		setTasks(newTasks);
 
-		if (features.clearOnSubmit) setInputTask("");
+		if (features[FeatureKeys.clearOnSubmit].active) setInputTask("");
 	};
 
 	const deleteTask = (index: number) => {
@@ -50,10 +95,10 @@ function ElaborateTodo({
 		setTasks(newTasks);
 	};
 
-	const toggleFeature = (feature: string) => {
-		const newFeatures = { ...features };
-		//@ts-expect-error
-		newFeatures[`${feature}`] = !newFeatures[`${feature}`];
+	const toggleFeature = (index: number) => {
+		const newFeatures = [...features];
+
+		newFeatures[index].active = !newFeatures[index].active;
 		setFeatures(newFeatures);
 	};
 
@@ -99,7 +144,7 @@ function ElaborateTodo({
 				<div className=" p-2" />
 				<TaskInput
 					addTask={addTask}
-					isForm={features.enterToSubmit}
+					isForm={features[FeatureKeys.enterToSubmit].active}
 					updateInput={updateInput}
 					inputTask={inputTask}
 					inputRef={inputRef}
@@ -114,7 +159,9 @@ function ElaborateTodo({
 							index={i}
 							updateTask={updateTask}
 							deleteTask={deleteTask}
-							clickToEdit={features.clickToEdit}
+							clickToEdit={
+								features[FeatureKeys.editableTasks].active
+							}
 						/>
 					);
 				})}
@@ -191,16 +238,11 @@ function FeaturesMenu({
 	featuresMenu,
 	toggleFeaturesMenu,
 }: {
-	features: { [key: string]: boolean };
-	toggleFeature: (feature: string) => void;
+	features: Feature[];
+	toggleFeature: (index: number) => void;
 	featuresMenu: boolean;
 	toggleFeaturesMenu: () => void;
 }) {
-	const camelToNormal = (feature: string): string => {
-		return feature
-			.replace(/([a-z])([A-Z])/g, "$1 $2") // inserts a space between lowercase and uppercase letters
-			.toLowerCase();
-	};
 	return (
 		<div
 			className={`absolute bottom-0 w-full transition-all  ${
@@ -219,17 +261,17 @@ function FeaturesMenu({
 				<div className=" w-full rounded-t-xl flex-1 h-0 overflow-hidden">
 					<div className="p-4 bg-ctp-surface1 w-full overflow-x-auto overflow-y-hidden h-full flex justify-between">
 						<div className="w-fit flex gap-2 flex-nowrap justify-between flex-1 h-full text-sm md:text-base">
-							{Object.keys(features).map((feature) => {
+							{features.map((feature, i) => {
 								return (
 									<button
 										className={`px-2 flex items-center text-ctp-text rounded-md border-2 duration-200 transition-all w-24 ${
-											features[`${feature}`]
+											feature.active
 												? " bg-ctp-blue font-semibold text-white border-white ctp-latte"
 												: "bg-ctp-surface2 border-transparent"
 										}`}
-										onClick={() => toggleFeature(feature)}
+										onClick={() => toggleFeature(i)}
 									>
-										{camelToNormal(feature)}
+										{feature.name}
 									</button>
 								);
 							})}
@@ -312,16 +354,17 @@ function TaskItem({
 			className=" p-3 rounded-md bg-ctp-base font-semibold text-lg shadow-md w-full flex justify-between"
 			onClick={() => {
 				if (!inputFocus && clickToEdit) {
+					//@ts-expect-error
 					inputRef.current.focus();
 					setInputFocus(true);
 				}
 			}}
 		>
 			{clickToEdit ? (
-				<form onSubmit={handleUpdateTask}>
+				<form className="flex-1 flex" onSubmit={handleUpdateTask}>
 					<input
 						ref={inputRef}
-						className={`bg-transparent outline-none ${
+						className={`bg-transparent flex-1 outline-none ${
 							inputFocus ? "" : "pointer-events-none"
 						}`}
 						value={currentTask}
@@ -334,7 +377,14 @@ function TaskItem({
 				<div>{task.item}</div>
 			)}
 			<div>
-				<button onClick={() => deleteTask(index)}>{trash}</button>
+				<button
+					onClick={(e) => {
+						e.stopPropagation();
+						deleteTask(index);
+					}}
+				>
+					{trash}
+				</button>
 			</div>
 		</div>
 	);
