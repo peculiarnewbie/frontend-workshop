@@ -43,10 +43,7 @@ export default function Index() {
 						<BasicTodo tasks={tasks} updateTasks={updateTasks} />
 					</div>
 					<div className="flex flex-col h-[70vh] w-full bg-ctp-surface2 border-ctp-blue border-2 rounded-xl overflow-clip shadow-lg max-w-[600px] min-w-80 min-h-96 relative">
-						<ElaborateTodo
-							tasks={tasks}
-							updateTasks={updateTasks}
-						/>
+						<ElaborateTodo tasks={tasks} setTasks={updateTasks} />
 					</div>
 				</div>
 			</div>

@@ -4,13 +4,13 @@ import { plus, trash, upArrow } from "./icons";
 
 function ElaborateTodo({
 	tasks,
-	updateTasks,
+	setTasks,
 }: {
 	tasks: Task[];
-	updateTasks: (newTasks: Task[]) => void;
+	setTasks: (newTasks: Task[]) => void;
 }) {
 	const [inputTask, setInputTask] = useState("");
-	const [feautresMenu, setFeautresMenu] = useState(false);
+	const [featuresMenu, setFeaturesMenu] = useState(false);
 	const [features, setFeatures] = useState({
 		enterToSubmit: true,
 		clearOnSubmit: true,
@@ -39,7 +39,7 @@ function ElaborateTodo({
 
 		const newTasks = [...tasks];
 		newTasks.push({ item: inputTask, done: false });
-		updateTasks(newTasks);
+		setTasks(newTasks);
 
 		if (features.clearOnSubmit) setInputTask("");
 	};
@@ -47,7 +47,7 @@ function ElaborateTodo({
 	const deleteTask = (index: number) => {
 		const newTasks = [...tasks];
 		newTasks.splice(index, 1);
-		updateTasks(newTasks);
+		setTasks(newTasks);
 	};
 
 	const toggleFeature = (feature: string) => {
@@ -55,12 +55,6 @@ function ElaborateTodo({
 		//@ts-expect-error
 		newFeatures[`${feature}`] = !newFeatures[`${feature}`];
 		setFeatures(newFeatures);
-	};
-
-	const camelToNormal = (feature: string): string => {
-		return feature
-			.replace(/([a-z])([A-Z])/g, "$1 $2") // inserts a space between lowercase and uppercase letters
-			.toLowerCase();
 	};
 
 	const calculateComplexity = () => {
@@ -88,6 +82,12 @@ function ElaborateTodo({
 		}
 	};
 
+	const updateTask = (updatedTask: Task, index: number) => {
+		const newTasks = [...tasks];
+		newTasks.splice(index, 1, updatedTask);
+		setTasks(newTasks);
+	};
+
 	useEffect(() => {
 		calculateComplexity();
 	}, [features]);
@@ -104,104 +104,25 @@ function ElaborateTodo({
 					inputTask={inputTask}
 					inputRef={inputRef}
 				/>
-				{/* <form
-					onSubmit={addTask}
-					className="ctp-latte flex gap-4 w-full max-w-96"
-				>
-					<input
-						className=" bg-ctp-base text-ctp-text rounded-md p-2 outline-ctp-blue outline-offset-1 font-semibold w-full"
-						type="text"
-						onChange={updateInput}
-						ref={inputRef}
-					/>
-					<button
-						className=" text-3xl font-bold bg-ctp-blue text-white outline-ctp-yellow rounded-full aspect-square h-10 align-text-top flex justify-center items-center"
-						type="submit"
-					>
-						{plus}
-					</button>
-				</form> */}
 			</div>
 			<div className="flex flex-col flex-1 overflow-auto items-center gap-4 p-6">
 				{tasks.map((task, i) => {
 					return (
-						<div className=" p-3 rounded-md bg-ctp-base font-semibold text-lg shadow-md w-full flex justify-between">
-							<div>{task.item}</div>
-							<div>
-								<button onClick={() => deleteTask(i)}>
-									{trash}
-								</button>
-							</div>
-						</div>
+						<TaskItem
+							key={i}
+							task={task}
+							index={i}
+							updateTask={updateTask}
+							deleteTask={deleteTask}
+						/>
 					);
 				})}
-				<div
-					className={`absolute bottom-0 w-full transition-all  ${
-						feautresMenu ? "h-24" : "h-0"
-					}`}
-				>
-					<div className="relative w-full h-full flex flex-col">
-						<div className="absolute w-full flex justify-center -top-16 h-0">
-							<button
-								className={`relative mx-auto font-medium text-lg flex flex-col w-24 items-center `}
-								onClick={() => setFeautresMenu(!feautresMenu)}
-							>
-								<div
-									className={`mx-auto w-fit transition-all duration-500 ${
-										feautresMenu
-											? " translate-y-8 rotate-180"
-											: "translate-y-2"
-									}`}
-								>
-									{upArrow}
-								</div>
-								<div className="absolute">
-									<p
-										className={` translate-y-2 transition-all duration-200 ${
-											feautresMenu
-												? " opacity-100"
-												: " opacity-0"
-										}`}
-									>
-										close
-									</p>
-									<p
-										className={` transition-all duration-200 ${
-											feautresMenu
-												? " opacity-0"
-												: " opacity-100"
-										}`}
-									>
-										features
-									</p>
-								</div>
-							</button>
-						</div>
-						<div className=" w-full rounded-t-xl flex-1 h-0 overflow-hidden">
-							<div className="p-4 bg-ctp-surface1 w-full overflow-x-auto overflow-y-hidden h-full flex justify-between">
-								<div className="w-fit flex gap-2 flex-nowrap justify-between flex-1 h-full text-sm md:text-base">
-									{Object.keys(features).map((feature) => {
-										return (
-											<button
-												className={`p-2 text-ctp-text rounded-md border-2 duration-200 transition-all w-24 ${
-													//@ts-expect-error
-													features[`${feature}`]
-														? " bg-ctp-blue font-semibold text-white border-white ctp-latte"
-														: "bg-ctp-surface2 border-transparent"
-												}`}
-												onClick={() =>
-													toggleFeature(feature)
-												}
-											>
-												{camelToNormal(feature)}
-											</button>
-										);
-									})}
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
+				<FeaturesMenu
+					features={features}
+					toggleFeature={toggleFeature}
+					featuresMenu={featuresMenu}
+					toggleFeaturesMenu={() => setFeaturesMenu(!featuresMenu)}
+				/>
 			</div>
 		</>
 	);
@@ -261,4 +182,139 @@ function TaskInput({
 				</button>
 			</div>
 		);
+}
+
+function FeaturesMenu({
+	features,
+	toggleFeature,
+	featuresMenu,
+	toggleFeaturesMenu,
+}: {
+	features: { [key: string]: boolean };
+	toggleFeature: (feature: string) => void;
+	featuresMenu: boolean;
+	toggleFeaturesMenu: () => void;
+}) {
+	const camelToNormal = (feature: string): string => {
+		return feature
+			.replace(/([a-z])([A-Z])/g, "$1 $2") // inserts a space between lowercase and uppercase letters
+			.toLowerCase();
+	};
+	return (
+		<div
+			className={`absolute bottom-0 w-full transition-all  ${
+				featuresMenu ? "h-24" : "h-0"
+			}`}
+		>
+			<div className="relative w-full h-full flex flex-col">
+				<div className="absolute w-full flex justify-center -top-16 h-0">
+					<button
+						className={`relative mx-auto font-medium text-lg flex flex-col w-24 items-center `}
+						onClick={toggleFeaturesMenu}
+					>
+						<PopupButton featuresMenu={featuresMenu} />
+					</button>
+				</div>
+				<div className=" w-full rounded-t-xl flex-1 h-0 overflow-hidden">
+					<div className="p-4 bg-ctp-surface1 w-full overflow-x-auto overflow-y-hidden h-full flex justify-between">
+						<div className="w-fit flex gap-2 flex-nowrap justify-between flex-1 h-full text-sm md:text-base">
+							{Object.keys(features).map((feature) => {
+								return (
+									<button
+										className={`px-2 flex items-center text-ctp-text rounded-md border-2 duration-200 transition-all w-24 ${
+											features[`${feature}`]
+												? " bg-ctp-blue font-semibold text-white border-white ctp-latte"
+												: "bg-ctp-surface2 border-transparent"
+										}`}
+										onClick={() => toggleFeature(feature)}
+									>
+										{camelToNormal(feature)}
+									</button>
+								);
+							})}
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	);
+}
+
+function PopupButton({ featuresMenu }: { featuresMenu: boolean }) {
+	return (
+		<>
+			<div
+				className={`mx-auto w-fit transition-transform duration-500 scale-x-150 ${
+					featuresMenu ? " translate-y-8 rotate-180" : "translate-y-2"
+				}`}
+			>
+				{upArrow}
+			</div>
+			<div className="absolute">
+				<p
+					className={` translate-y-2 transition-opacity duration-200 ${
+						featuresMenu ? " opacity-100" : " opacity-0"
+					}`}
+				>
+					close
+				</p>
+				<p
+					className={` transition-opacity duration-200 ${
+						featuresMenu ? " opacity-0" : " opacity-100"
+					}`}
+				>
+					features
+				</p>
+			</div>
+		</>
+	);
+}
+
+function TaskItem({
+	task,
+	index,
+	updateTask,
+	deleteTask,
+}: {
+	task: Task;
+	index: number;
+	updateTask: (updatedTask: Task, index: number) => void;
+	deleteTask: (index: number) => void;
+}) {
+	const [currentTask, setCurrentTask] = useState("");
+	const inputRef = useRef(null);
+
+	const updateCurrentTask = (e: ChangeEvent) => {
+		const value = (e.target as HTMLInputElement).value;
+		setCurrentTask(value);
+	};
+
+	const handleUpdateTask = (e: FormEvent) => {
+		e.preventDefault();
+		updateTask({ item: currentTask, done: false }, index);
+
+		//@ts-expect-error
+		inputRef.current.blur();
+	};
+
+	useEffect(() => {
+		setCurrentTask(task.item);
+	}, [task]);
+
+	return (
+		<div className=" p-3 rounded-md bg-ctp-base font-semibold text-lg shadow-md w-full flex justify-between">
+			<form onSubmit={handleUpdateTask}>
+				<input
+					ref={inputRef}
+					className="bg-transparent outline-none"
+					value={currentTask}
+					onChange={updateCurrentTask}
+					type="text"
+				/>
+			</form>
+			<div>
+				<button onClick={() => deleteTask(index)}>{trash}</button>
+			</div>
+		</div>
+	);
 }

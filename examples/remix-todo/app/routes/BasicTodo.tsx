@@ -50,7 +50,10 @@ function BasicTodo({
 			<div className="flex flex-col flex-1 overflow-auto items-center gap-4 p-6 ">
 				{tasks.map((task, i) => {
 					return (
-						<div className=" p-3 rounded-md bg-ctp-base font-semibold text-lg shadow-md w-full flex justify-between">
+						<div
+							key={i}
+							className=" p-3 rounded-md bg-ctp-base font-semibold text-lg shadow-md w-full flex justify-between"
+						>
 							<div>{task.item}</div>
 							<div>
 								<button onClick={() => deleteTask(i)}>
