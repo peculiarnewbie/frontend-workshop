@@ -114,6 +114,7 @@ function ElaborateTodo({
 							index={i}
 							updateTask={updateTask}
 							deleteTask={deleteTask}
+							clickToEdit={features.clickToEdit}
 						/>
 					);
 				})}
@@ -275,13 +276,17 @@ function TaskItem({
 	index,
 	updateTask,
 	deleteTask,
+	clickToEdit,
 }: {
 	task: Task;
 	index: number;
 	updateTask: (updatedTask: Task, index: number) => void;
 	deleteTask: (index: number) => void;
+	clickToEdit: boolean;
 }) {
 	const [currentTask, setCurrentTask] = useState("");
+	const [inputFocus, setInputFocus] = useState(false);
+
 	const inputRef = useRef(null);
 
 	const updateCurrentTask = (e: ChangeEvent) => {
@@ -295,6 +300,7 @@ function TaskItem({
 
 		//@ts-expect-error
 		inputRef.current.blur();
+		setInputFocus(false);
 	};
 
 	useEffect(() => {
@@ -302,16 +308,31 @@ function TaskItem({
 	}, [task]);
 
 	return (
-		<div className=" p-3 rounded-md bg-ctp-base font-semibold text-lg shadow-md w-full flex justify-between">
-			<form onSubmit={handleUpdateTask}>
-				<input
-					ref={inputRef}
-					className="bg-transparent outline-none"
-					value={currentTask}
-					onChange={updateCurrentTask}
-					type="text"
-				/>
-			</form>
+		<div
+			className=" p-3 rounded-md bg-ctp-base font-semibold text-lg shadow-md w-full flex justify-between"
+			onClick={() => {
+				if (!inputFocus && clickToEdit) {
+					inputRef.current.focus();
+					setInputFocus(true);
+				}
+			}}
+		>
+			{clickToEdit ? (
+				<form onSubmit={handleUpdateTask}>
+					<input
+						ref={inputRef}
+						className={`bg-transparent outline-none ${
+							inputFocus ? "" : "pointer-events-none"
+						}`}
+						value={currentTask}
+						onChange={updateCurrentTask}
+						onBlur={handleUpdateTask}
+						type="text"
+					/>
+				</form>
+			) : (
+				<div>{task.item}</div>
+			)}
 			<div>
 				<button onClick={() => deleteTask(index)}>{trash}</button>
 			</div>
