@@ -1,6 +1,6 @@
 import { ChangeEvent, FormEvent, useEffect, useRef, useState } from "react";
 import { Task } from "./_index";
-import { plus, trash } from "./icons";
+import { plus, trash, upArrow } from "./icons";
 
 function ElaborateTodo({
 	tasks,
@@ -122,7 +122,7 @@ function ElaborateTodo({
 					</button>
 				</form> */}
 			</div>
-			<div className="flex flex-col flex-1 overflow-auto items-center gap-4 p-6 relative">
+			<div className="flex flex-col flex-1 overflow-auto items-center gap-4 p-6">
 				{tasks.map((task, i) => {
 					return (
 						<div className=" p-3 rounded-md bg-ctp-base font-semibold text-lg shadow-md w-full flex justify-between">
@@ -136,21 +136,49 @@ function ElaborateTodo({
 					);
 				})}
 				<div
-					className={`absolute bottom-0 w-full transition-all ${
+					className={`absolute bottom-0 w-full transition-all  ${
 						feautresMenu ? "h-24" : "h-0"
 					}`}
 				>
 					<div className="relative w-full h-full flex flex-col">
-						<div className="absolute w-full flex justify-center -top-6">
+						<div className="absolute w-full flex justify-center -top-16 h-0">
 							<button
-								className=" mx-auto"
+								className={`relative mx-auto font-medium text-lg flex flex-col w-24 items-center `}
 								onClick={() => setFeautresMenu(!feautresMenu)}
 							>
-								{feautresMenu ? "close" : "open"}
+								<div
+									className={`mx-auto w-fit transition-all duration-500 ${
+										feautresMenu
+											? " translate-y-8 rotate-180"
+											: "translate-y-2"
+									}`}
+								>
+									{upArrow}
+								</div>
+								<div className="absolute">
+									<p
+										className={` translate-y-2 transition-all duration-200 ${
+											feautresMenu
+												? " opacity-100"
+												: " opacity-0"
+										}`}
+									>
+										close
+									</p>
+									<p
+										className={` transition-all duration-200 ${
+											feautresMenu
+												? " opacity-0"
+												: " opacity-100"
+										}`}
+									>
+										features
+									</p>
+								</div>
 							</button>
 						</div>
 						<div className=" w-full rounded-t-xl flex-1 h-0 overflow-hidden">
-							<div className="p-4 bg-ctp-surface1 w-full overflow-auto h-full flex justify-between">
+							<div className="p-4 bg-ctp-surface1 w-full overflow-x-auto overflow-y-hidden h-full flex justify-between">
 								<div className="w-fit flex gap-2 flex-nowrap justify-between flex-1 h-full text-sm md:text-base">
 									{Object.keys(features).map((feature) => {
 										return (
