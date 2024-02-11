@@ -1,20 +1,24 @@
 import { ChangeEvent, FormEvent, useEffect, useRef, useState } from "react";
 import { Task } from "./_index";
-import { plus, trash, upArrow } from "./icons";
+import { plus, trash } from "./icons";
+import FeaturesMenu from "./FeaturesMenu";
 
-type Feature = {
+export type Feature = {
 	name: string;
 	active: boolean;
 	description?: string;
-	subFeatures?: Feature[];
+	subFeatures?: number[];
+	isSub?: boolean;
 };
 
-const FeatureKeys = {
+export const FeatureKeys = {
 	enterToSubmit: 0,
 	clearOnSubmit: 1,
 	validateEmpty: 2,
 	editableTasks: 3,
-	reorderOnDrag: 4,
+	updateOnBlur: 4,
+	fixEditOnDelete: 5,
+	reorderOnDrag: 6,
 };
 
 function ElaborateTodo({
@@ -48,15 +52,19 @@ function ElaborateTodo({
 			active: true,
 			description: "click the task to edit tasks",
 			subFeatures: [
-				{
-					name: "update on blur",
-					active: true,
-				},
-				{
-					name: "prevent unintended click",
-					active: true,
-				},
+				FeatureKeys.updateOnBlur,
+				FeatureKeys.fixEditOnDelete,
 			],
+		},
+		{
+			name: "update on blur",
+			active: true,
+			isSub: true,
+		},
+		{
+			name: "fix edit on delete",
+			active: true,
+			isSub: true,
 		},
 		{
 			name: "reorder on drag",
@@ -104,10 +112,8 @@ function ElaborateTodo({
 
 	const calculateComplexity = () => {
 		let featureCount = 0;
-		const array = Object.entries(features);
-		for (let i = 0; i < array.length; i++) {
-			const [item, value] = array[i];
-			if (value) featureCount++;
+		for (let i = 0; i < features.length; i++) {
+			if (features[i].active && !features[i].isSub) featureCount++;
 		}
 
 		switch (featureCount) {
@@ -230,87 +236,6 @@ function TaskInput({
 				</button>
 			</div>
 		);
-}
-
-function FeaturesMenu({
-	features,
-	toggleFeature,
-	featuresMenu,
-	toggleFeaturesMenu,
-}: {
-	features: Feature[];
-	toggleFeature: (index: number) => void;
-	featuresMenu: boolean;
-	toggleFeaturesMenu: () => void;
-}) {
-	return (
-		<div
-			className={`absolute bottom-0 w-full transition-all  ${
-				featuresMenu ? "h-24" : "h-0"
-			}`}
-		>
-			<div className="relative w-full h-full flex flex-col">
-				<div className="absolute w-full flex justify-center -top-16 h-0">
-					<button
-						className={`relative mx-auto font-medium text-lg flex flex-col w-24 items-center `}
-						onClick={toggleFeaturesMenu}
-					>
-						<PopupButton featuresMenu={featuresMenu} />
-					</button>
-				</div>
-				<div className=" w-full rounded-t-xl flex-1 h-0 overflow-hidden">
-					<div className="p-4 bg-ctp-surface1 w-full overflow-x-auto overflow-y-hidden h-full flex justify-between">
-						<div className="w-fit flex gap-2 flex-nowrap justify-between flex-1 h-full text-sm md:text-base">
-							{features.map((feature, i) => {
-								return (
-									<button
-										className={`px-2 flex items-center text-ctp-text rounded-md border-2 duration-200 transition-all w-24 ${
-											feature.active
-												? " bg-ctp-blue font-semibold text-white border-white ctp-latte"
-												: "bg-ctp-surface2 border-transparent"
-										}`}
-										onClick={() => toggleFeature(i)}
-									>
-										{feature.name}
-									</button>
-								);
-							})}
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	);
-}
-
-function PopupButton({ featuresMenu }: { featuresMenu: boolean }) {
-	return (
-		<>
-			<div
-				className={`mx-auto w-fit transition-transform duration-500 scale-x-150 ${
-					featuresMenu ? " translate-y-8 rotate-180" : "translate-y-2"
-				}`}
-			>
-				{upArrow}
-			</div>
-			<div className="absolute">
-				<p
-					className={` translate-y-2 transition-opacity duration-200 ${
-						featuresMenu ? " opacity-100" : " opacity-0"
-					}`}
-				>
-					close
-				</p>
-				<p
-					className={` transition-opacity duration-200 ${
-						featuresMenu ? " opacity-0" : " opacity-100"
-					}`}
-				>
-					features
-				</p>
-			</div>
-		</>
-	);
 }
 
 function TaskItem({
