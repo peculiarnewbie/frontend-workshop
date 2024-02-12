@@ -14,6 +14,7 @@ function FeaturesMenu({
 	toggleFeaturesMenu: () => void;
 }) {
 	const [subMenu, setSubMenu] = useState(false);
+	const [activeIndex, setActiveIndex] = useState(0);
 
 	useEffect(() => {
 		if (!featuresMenu) setSubMenu(false);
@@ -39,11 +40,24 @@ function FeaturesMenu({
 					</button>
 				</div>
 				<div
-					className={`bg-ctp-surface0 transition-all rounded-t-xl ${
+					className={`bg-ctp-surface0 transition-all rounded-t-xl flex justify-center gap-4 ${
 						subMenu ? "h-20" : "h-0"
 					}`}
 				>
-					hi
+					{features[activeIndex].subFeatures?.map((subFeature, i) => {
+						if (subMenu)
+							return (
+								<div className="p-2 h-full flex" key={i}>
+									<FeatureButton
+										feature={features[subFeature]}
+										toggleFeature={toggleFeature}
+										index={activeIndex + i + 1}
+										setSubMenu={(s: boolean) => {}}
+										setActiveIndex={(i: number) => {}}
+									/>
+								</div>
+							);
+					})}
 				</div>
 				<div className=" w-full rounded-t-xl flex-1 h-24 overflow-hidden">
 					<div className="p-4 bg-ctp-surface1 w-full overflow-x-auto overflow-y-hidden h-full flex justify-between">
@@ -56,11 +70,11 @@ function FeaturesMenu({
 											toggleFeature={toggleFeature}
 											index={i}
 											key={i}
-											subFeatures={feature.subFeatures?.map(
-												(item) => features[item]
-											)}
 											setSubMenu={(state: boolean) =>
 												setSubMenu(state)
+											}
+											setActiveIndex={(index: number) =>
+												setActiveIndex(index)
 											}
 										/>
 									);
@@ -109,19 +123,31 @@ function FeatureButton({
 	feature,
 	toggleFeature,
 	index,
-	subFeatures,
 	setSubMenu,
+	setActiveIndex,
 }: {
 	feature: Feature;
 	toggleFeature: (index: number) => void;
 	index: number;
-	subFeatures?: Feature[];
 	setSubMenu: (state: boolean) => void;
+	setActiveIndex: (index: number) => void;
 }) {
 	const [hoverCard, setHoverCard] = useState(false);
 	const [hoverCardPos, setHoverCardPos] = useState({ x: 0, y: 0 });
 	const popupRef = useRef(null);
 	const buttonRef = useRef(null);
+
+	const handleToggleFeature = () => {
+		toggleFeature(index);
+
+		if (feature.subFeatures) {
+			feature.subFeatures.forEach((subIndex) => {
+				toggleFeature(subIndex);
+			});
+		}
+
+		if (!feature.isSub) return;
+	};
 
 	useEffect(() => {
 		if (popupRef.current && buttonRef.current) {
@@ -146,8 +172,10 @@ function FeatureButton({
 						: "bg-ctp-surface2 border-transparent"
 				}`}
 				onClick={() => {
-					toggleFeature(index);
-					setSubMenu(true);
+					handleToggleFeature();
+					setActiveIndex(index);
+					if (feature.subFeatures) setSubMenu(true);
+					else setSubMenu(false);
 				}}
 				onPointerEnter={() => setHoverCard(true)}
 				onPointerLeave={() => setHoverCard(false)}

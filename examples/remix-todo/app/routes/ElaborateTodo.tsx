@@ -8,7 +8,7 @@ export type Feature = {
 	active: boolean;
 	description?: string;
 	subFeatures?: number[];
-	isSub?: boolean;
+	isSub?: 1 | 2; // currently active or not
 };
 
 export const FeatureKeys = {
@@ -59,12 +59,12 @@ function ElaborateTodo({
 		{
 			name: "update on blur",
 			active: true,
-			isSub: true,
+			isSub: 2,
 		},
 		{
 			name: "fix edit on delete",
 			active: true,
-			isSub: true,
+			isSub: 2,
 		},
 		{
 			name: "reorder on drag",
@@ -105,7 +105,6 @@ function ElaborateTodo({
 
 	const toggleFeature = (index: number) => {
 		const newFeatures = [...features];
-
 		newFeatures[index].active = !newFeatures[index].active;
 		setFeatures(newFeatures);
 	};
