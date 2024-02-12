@@ -18,7 +18,11 @@ function BasicTodo({
 
 	const addTask = () => {
 		const newTasks = [...tasks];
-		newTasks.push({ item: inputTask, done: false });
+		newTasks.push({
+			id: crypto.randomUUID(),
+			item: inputTask,
+			done: false,
+		});
 		updateTasks(newTasks);
 	};
 
@@ -52,11 +56,14 @@ function BasicTodo({
 					return (
 						<div
 							key={i}
-							className=" p-3 rounded-md bg-ctp-base font-semibold text-lg shadow-md w-full flex justify-between"
+							className="rounded-md bg-ctp-base font-semibold text-lg shadow-md w-full flex justify-between min-h-10"
 						>
-							<div>{task.item}</div>
+							<div className="p-3">{task.item}</div>
 							<div>
-								<button onClick={() => deleteTask(i)}>
+								<button
+									className="px-3 h-full rounded-r-md hover:bg-ctp-red"
+									onClick={() => deleteTask(i)}
+								>
 									{trash}
 								</button>
 							</div>

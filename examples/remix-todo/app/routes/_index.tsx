@@ -17,14 +17,15 @@ export const meta: MetaFunction = () => {
 };
 
 export type Task = {
+	id: string;
 	item: string;
 	done: boolean;
 };
 
 export default function Index() {
 	const [tasks, setTasks] = useState<Task[]>([
-		{ item: "do stuff", done: false },
-		{ item: "stuff done", done: true },
+		{ id: crypto.randomUUID(), item: "do stuff", done: false },
+		{ id: crypto.randomUUID(), item: "stuff done", done: true },
 	]);
 	const [darkTheme, setDarkTheme] = useState(true);
 
