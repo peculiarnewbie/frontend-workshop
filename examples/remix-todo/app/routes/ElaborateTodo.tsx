@@ -1,4 +1,11 @@
-import { ChangeEvent, FormEvent, useEffect, useRef, useState } from "react";
+import {
+	ChangeEvent,
+	DragEvent,
+	FormEvent,
+	useEffect,
+	useRef,
+	useState,
+} from "react";
 import { Task } from "./_index";
 import { plus, trash } from "./icons";
 import FeaturesMenu from "./FeaturesMenu";
@@ -19,6 +26,8 @@ export const FeatureKeys = {
 	updateOnBlur: 4,
 	fixEditOnDelete: 5,
 	reorderOnDrag: 6,
+	reorderPreview: 7,
+	handleOvershoot: 8,
 };
 
 function ElaborateTodo({
@@ -30,6 +39,8 @@ function ElaborateTodo({
 }) {
 	const [inputTask, setInputTask] = useState("");
 	const [featuresMenu, setFeaturesMenu] = useState(true);
+	const [complexity, setComplexity] = useState("Elaborate");
+	const [dragTargetIndex, setDragTargetIndex] = useState(-1);
 	const [features, setFeatures] = useState<Feature[]>([
 		{
 			name: "enter to submit",
@@ -72,10 +83,27 @@ function ElaborateTodo({
 		{
 			name: "reorder on drag",
 			active: true,
-			description: "reorder tasks by clicking and dragging them",
+			description: "reorder tasks by dragging them",
+			subFeatures: [
+				FeatureKeys.reorderPreview,
+				FeatureKeys.handleOvershoot,
+			],
+		},
+		{
+			name: "reorder preview",
+			active: true,
+			description:
+				"show feedback of where the reordered task will end up at",
+			isSub: true,
+		},
+		{
+			name: "handle overshoot",
+			active: true,
+			description:
+				"if user reorders too far, reorder to the appropriate location",
+			isSub: true,
 		},
 	]);
-	const [complexity, setComplexity] = useState("Elaborate");
 	const inputRef = useRef(null);
 
 	const updateInput = (e: ChangeEvent) => {
@@ -95,7 +123,11 @@ function ElaborateTodo({
 		}
 
 		const newTasks = [...tasks];
-		newTasks.push({ item: inputTask, done: false });
+		newTasks.push({
+			id: crypto.randomUUID(),
+			item: inputTask,
+			done: false,
+		});
 		setTasks(newTasks);
 
 		if (features[FeatureKeys.clearOnSubmit].active) setInputTask("");
@@ -112,23 +144,6 @@ function ElaborateTodo({
 
 		newFeatures[index].active = !newFeatures[index].active;
 
-		if (newFeatures[index].subFeatures) {
-			if (!newFeatures[index].active)
-				newFeatures[index].subFeatures?.forEach((subFeature) => {
-					newFeatures[subFeature].active = false;
-				});
-		} else if (newFeatures[index].isSub) {
-			let parentIndex = index - 1;
-			while (!features[parentIndex].subFeatures) {
-				console.log("search for parent", parentIndex);
-				parentIndex--;
-			}
-			let state = false;
-			newFeatures[parentIndex].subFeatures?.forEach((subFeature) => {
-				if (newFeatures[subFeature].active) state = true;
-			});
-			newFeatures[parentIndex].active = state;
-		}
 		setFeatures(newFeatures);
 	};
 
@@ -161,6 +176,29 @@ function ElaborateTodo({
 		setTasks(newTasks);
 	};
 
+	const reorderTasks = (oldIndex: number, newIndex: number) => {
+		const newTasks = [...tasks];
+		const task = { ...newTasks[oldIndex] };
+
+		let targetIndex = newIndex;
+
+		if (features[FeatureKeys.handleOvershoot].active) {
+			if (newIndex < 0) targetIndex = 0;
+			else if (newIndex > tasks.length - 1)
+				targetIndex = tasks.length - 1;
+		} else {
+			if (newIndex < 0 || newIndex > tasks.length - 1) {
+				setDragTargetIndex(-1);
+				return;
+			}
+		}
+
+		newTasks.splice(oldIndex, 1);
+		newTasks.splice(targetIndex, 0, task);
+		setTasks(newTasks);
+		setDragTargetIndex(-1);
+	};
+
 	useEffect(() => {
 		calculateComplexity();
 	}, [features]);
@@ -178,19 +216,31 @@ function ElaborateTodo({
 					inputRef={inputRef}
 				/>
 			</div>
-			<div className="flex flex-col flex-1 overflow-auto items-center gap-4 p-6">
-				{tasks.map((task, i) => {
-					return (
+			<div className="flex flex-col flex-1 overflow-auto items-center gap-[7px] p-6">
+				{tasks.map((task, i) => (
+					<div className="w-full" key={task.id}>
 						<TaskItem
-							key={i}
 							task={task}
 							index={i}
 							updateTask={updateTask}
 							deleteTask={deleteTask}
 							features={features}
+							setDragIndex={(index: number) =>
+								setDragTargetIndex(index)
+							}
+							reorderTasks={reorderTasks}
 						/>
-					);
-				})}
+
+						<div
+							className={` w-full h-[2px] mt-[7px] ${
+								dragTargetIndex == i &&
+								features[FeatureKeys.reorderPreview].active
+									? "bg-ctp-red"
+									: "bg-transparent"
+							}`}
+						/>
+					</div>
+				))}
 				<FeaturesMenu
 					features={features}
 					toggleFeature={toggleFeature}
@@ -264,12 +314,16 @@ function TaskItem({
 	updateTask,
 	deleteTask,
 	features,
+	setDragIndex,
+	reorderTasks,
 }: {
 	task: Task;
 	index: number;
 	updateTask: (updatedTask: Task, index: number) => void;
 	deleteTask: (index: number) => void;
 	features: Feature[];
+	setDragIndex: (index: number) => void;
+	reorderTasks: (oldIndex: number, newIndex: number) => void;
 }) {
 	const [currentTask, setCurrentTask] = useState("");
 	const [inputFocus, setInputFocus] = useState(false);
@@ -283,11 +337,31 @@ function TaskItem({
 
 	const handleUpdateTask = (e: FormEvent) => {
 		e.preventDefault();
-		updateTask({ item: currentTask, done: false }, index);
+		updateTask({ id: task.id, item: currentTask, done: false }, index);
 
 		//@ts-expect-error
 		inputRef.current.blur();
 		setInputFocus(false);
+	};
+
+	const handleDrag = (e: DragEvent) => {
+		const pos = e.pageY;
+		//@ts-expect-error
+		const el = inputRef.current as HTMLElement;
+
+		const y = el.getBoundingClientRect().top - pos + 34;
+		const newIndex = index - Math.floor(y / 68);
+		setDragIndex(newIndex);
+	};
+
+	const handleReorder = (e: DragEvent) => {
+		const pos = e.pageY;
+		//@ts-expect-error
+		const el = inputRef.current as HTMLElement;
+
+		const y = el.getBoundingClientRect().top - pos + 34;
+		const newIndex = index - Math.floor(y / 68);
+		reorderTasks(index, newIndex);
 	};
 
 	useEffect(() => {
@@ -296,7 +370,14 @@ function TaskItem({
 
 	return (
 		<div
-			className=" p-3 rounded-md bg-ctp-base font-semibold text-lg shadow-md w-full flex justify-between"
+			draggable={`${
+				features[FeatureKeys.reorderOnDrag].active ? "true" : "false"
+			}`}
+			className={` rounded-md bg-ctp-base font-semibold text-lg shadow-md w-full flex justify-between ${
+				!inputFocus && features[FeatureKeys.editableTasks].active
+					? "cursor-pointer"
+					: ""
+			}`}
 			onClick={() => {
 				if (!inputFocus && features[FeatureKeys.editableTasks].active) {
 					//@ts-expect-error
@@ -304,9 +385,14 @@ function TaskItem({
 					setInputFocus(true);
 				}
 			}}
+			onDrag={handleDrag}
+			onDragEnd={handleReorder}
 		>
 			{features[FeatureKeys.editableTasks].active ? (
-				<form className="flex-1 flex" onSubmit={handleUpdateTask}>
+				<form
+					className=" min-w-0 grow flex p-3"
+					onSubmit={handleUpdateTask}
+				>
 					<input
 						ref={inputRef}
 						className={`bg-transparent flex-1 outline-none ${
@@ -322,10 +408,11 @@ function TaskItem({
 					/>
 				</form>
 			) : (
-				<div>{task.item}</div>
+				<div className="p-3">{task.item}</div>
 			)}
 			<div>
 				<button
+					className="h-full px-3 hover:bg-ctp-red rounded-r-md"
 					onClick={(e) => {
 						if (features[FeatureKeys.fixEditOnDelete].active)
 							e.stopPropagation();
