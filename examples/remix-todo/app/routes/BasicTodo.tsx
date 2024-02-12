@@ -56,9 +56,9 @@ function BasicTodo({
 					return (
 						<div
 							key={i}
-							className="rounded-md bg-ctp-base font-semibold text-lg shadow-md w-full flex justify-between min-h-10"
+							className="rounded-md bg-ctp-base font-semibold text-lg shadow-md w-full flex justify-between h-fit "
 						>
-							<div className="p-3">{task.item}</div>
+							<div className="p-3 h-fit">{task.item}</div>
 							<div>
 								<button
 									className="px-3 h-full rounded-r-md hover:bg-ctp-red"

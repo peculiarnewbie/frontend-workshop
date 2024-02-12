@@ -28,6 +28,7 @@ export const FeatureKeys = {
 	reorderOnDrag: 6,
 	reorderPreview: 7,
 	handleOvershoot: 8,
+	preventDragOnEdit: 9,
 };
 
 function ElaborateTodo({
@@ -87,6 +88,7 @@ function ElaborateTodo({
 			subFeatures: [
 				FeatureKeys.reorderPreview,
 				FeatureKeys.handleOvershoot,
+				FeatureKeys.preventDragOnEdit,
 			],
 		},
 		{
@@ -101,6 +103,12 @@ function ElaborateTodo({
 			active: true,
 			description:
 				"if user reorders too far, reorder to the appropriate location",
+			isSub: true,
+		},
+		{
+			name: "fix drag on edit",
+			active: true,
+			description: "prevent dragging current task when editing",
 			isSub: true,
 		},
 	]);
@@ -371,7 +379,10 @@ function TaskItem({
 	return (
 		<div
 			draggable={`${
-				features[FeatureKeys.reorderOnDrag].active ? "true" : "false"
+				features[FeatureKeys.reorderOnDrag].active &&
+				(!inputFocus || !features[FeatureKeys.preventDragOnEdit].active)
+					? "true"
+					: "false"
 			}`}
 			className={` rounded-md bg-ctp-base font-semibold text-lg shadow-md w-full flex justify-between ${
 				!inputFocus && features[FeatureKeys.editableTasks].active
