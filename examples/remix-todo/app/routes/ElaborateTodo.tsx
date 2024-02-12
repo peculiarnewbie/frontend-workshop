@@ -8,7 +8,7 @@ export type Feature = {
 	active: boolean;
 	description?: string;
 	subFeatures?: number[];
-	isSub?: 1 | 2; // currently active or not
+	isSub?: boolean;
 };
 
 export const FeatureKeys = {
@@ -59,16 +59,20 @@ function ElaborateTodo({
 		{
 			name: "update on blur",
 			active: true,
-			isSub: 2,
+			isSub: true,
+			description: "you can just click off the task to save your edits",
 		},
 		{
 			name: "fix edit on delete",
 			active: true,
-			isSub: 2,
+			isSub: true,
+			description:
+				"fixes a bug where the next task is selected after deleting",
 		},
 		{
 			name: "reorder on drag",
 			active: true,
+			description: "reorder tasks by clicking and dragging them",
 		},
 	]);
 	const [complexity, setComplexity] = useState("Elaborate");
@@ -109,19 +113,21 @@ function ElaborateTodo({
 		newFeatures[index].active = !newFeatures[index].active;
 
 		if (newFeatures[index].subFeatures) {
-			const state = newFeatures[index].active;
-			newFeatures[index].subFeatures?.forEach((subFeature) => {
-				if (features[subFeature].isSub == 2)
-					newFeatures[subFeature].active = state;
-			});
+			if (!newFeatures[index].active)
+				newFeatures[index].subFeatures?.forEach((subFeature) => {
+					newFeatures[subFeature].active = false;
+				});
 		} else if (newFeatures[index].isSub) {
-			//@ts-expect-error
-			newFeatures[index].isSub = (newFeatures[index].isSub % 2) + 1;
 			let parentIndex = index - 1;
 			while (!features[parentIndex].subFeatures) {
 				console.log("search for parent", parentIndex);
 				parentIndex--;
 			}
+			let state = false;
+			newFeatures[parentIndex].subFeatures?.forEach((subFeature) => {
+				if (newFeatures[subFeature].active) state = true;
+			});
+			newFeatures[parentIndex].active = state;
 		}
 		setFeatures(newFeatures);
 	};
@@ -181,9 +187,7 @@ function ElaborateTodo({
 							index={i}
 							updateTask={updateTask}
 							deleteTask={deleteTask}
-							clickToEdit={
-								features[FeatureKeys.editableTasks].active
-							}
+							features={features}
 						/>
 					);
 				})}
@@ -259,13 +263,13 @@ function TaskItem({
 	index,
 	updateTask,
 	deleteTask,
-	clickToEdit,
+	features,
 }: {
 	task: Task;
 	index: number;
 	updateTask: (updatedTask: Task, index: number) => void;
 	deleteTask: (index: number) => void;
-	clickToEdit: boolean;
+	features: Feature[];
 }) {
 	const [currentTask, setCurrentTask] = useState("");
 	const [inputFocus, setInputFocus] = useState(false);
@@ -294,14 +298,14 @@ function TaskItem({
 		<div
 			className=" p-3 rounded-md bg-ctp-base font-semibold text-lg shadow-md w-full flex justify-between"
 			onClick={() => {
-				if (!inputFocus && clickToEdit) {
+				if (!inputFocus && features[FeatureKeys.editableTasks].active) {
 					//@ts-expect-error
 					inputRef.current.focus();
 					setInputFocus(true);
 				}
 			}}
 		>
-			{clickToEdit ? (
+			{features[FeatureKeys.editableTasks].active ? (
 				<form className="flex-1 flex" onSubmit={handleUpdateTask}>
 					<input
 						ref={inputRef}
@@ -310,7 +314,10 @@ function TaskItem({
 						}`}
 						value={currentTask}
 						onChange={updateCurrentTask}
-						onBlur={handleUpdateTask}
+						onBlur={(e) => {
+							if (features[FeatureKeys.updateOnBlur].active)
+								handleUpdateTask(e);
+						}}
 						type="text"
 					/>
 				</form>
@@ -320,7 +327,8 @@ function TaskItem({
 			<div>
 				<button
 					onClick={(e) => {
-						e.stopPropagation();
+						if (features[FeatureKeys.fixEditOnDelete].active)
+							e.stopPropagation();
 						deleteTask(index);
 					}}
 				>
