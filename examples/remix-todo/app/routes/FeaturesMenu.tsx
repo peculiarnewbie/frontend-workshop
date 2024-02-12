@@ -137,18 +137,6 @@ function FeatureButton({
 	const popupRef = useRef(null);
 	const buttonRef = useRef(null);
 
-	const handleToggleFeature = () => {
-		toggleFeature(index);
-
-		if (feature.subFeatures) {
-			feature.subFeatures.forEach((subIndex) => {
-				toggleFeature(subIndex);
-			});
-		}
-
-		if (!feature.isSub) return;
-	};
-
 	useEffect(() => {
 		if (popupRef.current && buttonRef.current) {
 			const popup = popupRef.current as HTMLElement;
@@ -172,7 +160,7 @@ function FeatureButton({
 						: "bg-ctp-surface2 border-transparent"
 				}`}
 				onClick={() => {
-					handleToggleFeature();
+					toggleFeature(index);
 					setActiveIndex(index);
 					if (feature.subFeatures) setSubMenu(true);
 					else setSubMenu(false);

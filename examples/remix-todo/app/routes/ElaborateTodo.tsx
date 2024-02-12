@@ -105,7 +105,24 @@ function ElaborateTodo({
 
 	const toggleFeature = (index: number) => {
 		const newFeatures = [...features];
+
 		newFeatures[index].active = !newFeatures[index].active;
+
+		if (newFeatures[index].subFeatures) {
+			const state = newFeatures[index].active;
+			newFeatures[index].subFeatures?.forEach((subFeature) => {
+				if (features[subFeature].isSub == 2)
+					newFeatures[subFeature].active = state;
+			});
+		} else if (newFeatures[index].isSub) {
+			//@ts-expect-error
+			newFeatures[index].isSub = (newFeatures[index].isSub % 2) + 1;
+			let parentIndex = index - 1;
+			while (!features[parentIndex].subFeatures) {
+				console.log("search for parent", parentIndex);
+				parentIndex--;
+			}
+		}
 		setFeatures(newFeatures);
 	};
 
