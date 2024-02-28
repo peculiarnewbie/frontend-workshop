@@ -21,7 +21,7 @@ const { slide } = Astro.params;
         <p>slide {slide}</p>
         <a href={`/slides/${slide-1}`}>prev</a>
         <a href={`/slides/${Number(slide)+1}`}>next</a>
-		<PresentationNavigation client:load />
+		<PresentationNavigation slide={slide} client:load />
 	</main>
 </Layout>
 
