@@ -1,3 +1,4 @@
+import { navigate } from "astro/virtual-modules/transitions-router.js";
 import { createEffect, createSignal } from "solid-js";
 
 function PresentationNavigation(props: {
@@ -7,7 +8,7 @@ function PresentationNavigation(props: {
 	let webSocket: WebSocket | null = null;
 
 	const moveToPage = (page: number) => {
-		window.location.href = `/slides/${page}`;
+		navigate(`/slides/${page}`);
 	};
 
 	const followPresenter = (message: { urgency: string; slide: number }) => {
