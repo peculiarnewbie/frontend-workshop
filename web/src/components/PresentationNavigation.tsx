@@ -1,17 +1,53 @@
 import { createEffect, createSignal } from "solid-js";
 
-function PresentationNavigation(props: { slide: number }) {
-	const [page, setPage] = createSignal(1);
+function PresentationNavigation(props: {
+	slide: number;
+	isPresenter: boolean;
+}) {
+	let webSocket: WebSocket | null = null;
 
-	const nextPage = () => {
-		window.location.href = `/slides/${Number(props.slide) + 1}`;
+	const moveToPage = (page: number) => {
+		window.location.href = `/slides/${page}`;
 	};
+
+	const followPresenter = (message: { urgency: string; slide: number }) => {
+		if (message.urgency === "now") {
+			moveToPage(message.slide);
+		}
+	};
+
+	createEffect(() => {
+		if (webSocket) {
+			webSocket.close();
+		}
+		webSocket = new WebSocket(
+			"wss://unity-cf-relay.peculiarnewbie.workers.dev/api/room/hecc/websocket"
+		);
+		webSocket.onopen = () => {
+			if (webSocket) {
+				webSocket.send(
+					JSON.stringify({ type: "join", slide: props.slide })
+				);
+			}
+		};
+		webSocket.onmessage = (event) => {
+			const data = JSON.parse((event.data as string).slice(18));
+
+			console.log(data);
+
+			if ("type" in data && data.type === "slide") {
+				followPresenter(data);
+			}
+
+			// if (data.type === "slide") {
+			// 	setPage(data.slide);
+			// }
+		};
+	});
 
 	return (
 		<div class="text-red-500">
-			<button onclick={() => setPage(page() - 1)}>prev</button>
-			<div>{page()}</div>
-			<button onclick={nextPage}>next</button>
+			<div>slide: {props.slide}</div>
 		</div>
 	);
 }

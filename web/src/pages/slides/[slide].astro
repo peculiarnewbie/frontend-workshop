@@ -1,28 +1,30 @@
 ---
-import Layout from '../../layouts/Layout.astro';
-import Card from '../../components/Card.astro';
-import PresentationNavigation from '../../components/PresentationNavigation'; 
+import Layout from "../../layouts/Layout.astro";
+import Card from "../../components/Card.astro";
+import PresentationNavigation from "../../components/PresentationNavigation";
 
 export function getStaticPaths() {
-    const slides: {params: {slide:number}}[] = []
-    for(let i=0; i< 5; i++){
-        slides.push({params: {slide: i}})
-    }
-    return slides
+	const slides: { params: { slide: number } }[] = [];
+	for (let i = 0; i < 5; i++) {
+		slides.push({ params: { slide: i } });
+	}
+	return slides;
 }
 
 const { slide } = Astro.params;
-
 ---
 
 <Layout title="Welcome to Astro.">
 	<main>
-		<div class=" text-red-200">ok</div>
-        <p>slide {slide}</p>
-        <a href={`/slides/${slide-1}`}>prev</a>
-        <a href={`/slides/${Number(slide)+1}`}>next</a>
-		<PresentationNavigation slide={slide} client:load />
+		<div class="text-red-200">ok</div>
+		<p>slide {slide}</p>
+		<a href={`/slides/${slide - 1}`}>prev</a>
+		<a href={`/slides/${Number(slide) + 1}`}>next</a>
+		<PresentationNavigation
+			slide={1}
+			client:load
+			transition:persist
+			isPresenter={false}
+		/>
 	</main>
 </Layout>
-
-
