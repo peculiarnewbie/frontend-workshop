@@ -25,9 +25,10 @@ function PresentationNavigation(props: {
 		id = toaster.show((props) => (
 			<Toast.Root
 				toastId={props.toastId}
-				class="flex flex-col items-center justify-between gap-2 rounded-md p-3 bg-ctp-mantle/50 dark:bg-ctp-surface0 text-ctp-text border border-ctp-crust shadow-md"
+				class="flex flex-col items-center justify-between gap-2 rounded-md p-3 bg-ctp-mantle/50 dark:bg-ctp-surface0 text-ctp-text border border-ctp-crust shadow-md
+				data-[opened]:animate-sonner-fade-in data-[closed]:animate-sonner-fade-out"
 			>
-				<div class="toast__content">
+				<div class="flex items-start w-full">
 					<div>
 						<Toast.Title class="toast__title">
 							Event has been created
@@ -36,12 +37,18 @@ function PresentationNavigation(props: {
 							Monday, January 3rd at 6:00pm
 						</Toast.Description>
 					</div>
-					<Toast.CloseButton class="toast__close-button">
+					<Toast.CloseButton class=" shrink h-4 w-4 ml-auto">
 						x
 					</Toast.CloseButton>
 				</div>
-				<Toast.ProgressTrack class="toast__progress-track">
-					<Toast.ProgressFill class="toast__progress-fill" />
+				<Toast.ProgressTrack class=" h-2 w-full bg-ctp-surface0 rounded-sm">
+					<Toast.ProgressFill
+						class="bg-ctp-blue rounded-sm h-full"
+						style={{
+							width: `var(--kb-toast-progress-fill-width)`,
+							transition: "width 250ms linear",
+						}}
+					/>
 				</Toast.ProgressTrack>
 			</Toast.Root>
 		));
@@ -70,10 +77,6 @@ function PresentationNavigation(props: {
 			if ("type" in data && data.type === "slide") {
 				followPresenter(data);
 			}
-
-			// if (data.type === "slide") {
-			// 	setPage(data.slide);
-			// }
 		};
 	});
 
