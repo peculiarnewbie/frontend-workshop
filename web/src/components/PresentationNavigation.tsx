@@ -25,7 +25,7 @@ function PresentationNavigation(props: {
 		id = toaster.show((props) => (
 			<Toast.Root
 				toastId={props.toastId}
-				class="flex flex-col items-center justify-between gap-2 rounded-md p-3 bg-ctp-surface0/50"
+				class="flex flex-col items-center justify-between gap-2 rounded-md p-3 bg-ctp-mantle/50 dark:bg-ctp-surface0 text-ctp-text border border-ctp-crust shadow-md"
 			>
 				<div class="toast__content">
 					<div>

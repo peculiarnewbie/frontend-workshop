@@ -1,16 +1,24 @@
 ---
-import PresentationNavigation from "../components/PresentationNavigation";
+import Header from "../components/Header.astro";
 import { ViewTransitions } from "astro:transitions";
+import { themeClasses } from "../helpers/consts";
 
 interface Props {
 	title: string;
+}
+
+let theme = Astro.cookies.get("theme")?.value ?? "light";
+
+let documentClass = themeClasses.light;
+if (theme === "dark") {
+	documentClass = themeClasses.dark;
 }
 
 const { title } = Astro.props;
 ---
 
 <!doctype html>
-<html lang="en" class="bg-ctp-base">
+<html lang="en" class={documentClass}>
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="description" content="Astro description" />
@@ -20,6 +28,7 @@ const { title } = Astro.props;
 		<title>{title}</title>
 	</head>
 	<body>
+		<Header />
 		<slot />
 
 		<ViewTransitions />

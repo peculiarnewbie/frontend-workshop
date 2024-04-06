@@ -1,0 +1,5 @@
+---
+import ThemeSwitch from "./ThemeSwitch";
+---
+
+<ThemeSwitch client:load theme={Astro.cookies.get("theme")?.value ?? "light"} />
