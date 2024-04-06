@@ -2,14 +2,19 @@ import { Button, Toast, toaster } from "@kobalte/core";
 import { navigate } from "astro/virtual-modules/transitions-router.js";
 import { createEffect, createSignal } from "solid-js";
 import { Portal } from "solid-js/web";
+import NaviagtionToast from "./NaviagtionToast";
 
-function PresentationNavigation(props: {
+const dev = true;
+
+export default function PresentationNavigation(props: {
 	slide: number;
 	isPresenter: boolean;
 }) {
 	let webSocket: WebSocket | null = null;
 	let id: number;
-	const dev = true;
+	let toastTimeout: NodeJS.Timeout | null = null;
+
+	const [toastShown, setToastShown] = createSignal(false);
 
 	const moveToPage = (page: number) => {
 		navigate(`/slides/${page}`);
@@ -21,37 +26,38 @@ function PresentationNavigation(props: {
 		}
 	};
 
-	const showToast = () => {
+	const showToast = (page: number) => {
+		if (toastShown()) {
+			updateToast(page);
+			return;
+		}
+		setToastShown(true);
 		id = toaster.show((props) => (
-			<Toast.Root
-				toastId={props.toastId}
-				class="flex flex-col items-center justify-between gap-2 rounded-md p-3 bg-ctp-mantle/50 dark:bg-ctp-surface0 text-ctp-text border border-ctp-crust shadow-md
-				data-[opened]:animate-sonner-fade-in data-[closed]:animate-sonner-fade-out"
-			>
-				<div class="flex items-start w-full">
-					<div>
-						<Toast.Title class="toast__title">
-							Event has been created
-						</Toast.Title>
-						<Toast.Description class="toast__description">
-							Monday, January 3rd at 6:00pm
-						</Toast.Description>
-					</div>
-					<Toast.CloseButton class=" shrink h-4 w-4 ml-auto">
-						x
-					</Toast.CloseButton>
-				</div>
-				<Toast.ProgressTrack class=" h-2 w-full bg-ctp-surface0 rounded-sm">
-					<Toast.ProgressFill
-						class="bg-ctp-blue rounded-sm h-full"
-						style={{
-							width: `var(--kb-toast-progress-fill-width)`,
-							transition: "width 250ms linear",
-						}}
-					/>
-				</Toast.ProgressTrack>
-			</Toast.Root>
+			<NaviagtionToast
+				id={props.toastId}
+				onAction={() => console.log("follow")}
+				currentPage={page}
+			/>
 		));
+		toastTimeout = setTimeout(() => {
+			setToastShown(false);
+		}, 5000);
+	};
+
+	const updateToast = (page: number) => {
+		if (toastTimeout) {
+			clearTimeout(toastTimeout);
+		}
+		toaster.update(id, (props) => (
+			<NaviagtionToast
+				id={props.toastId}
+				onAction={() => console.log("follow")}
+				currentPage={page}
+			/>
+		));
+		toastTimeout = setTimeout(() => {
+			setToastShown(false);
+		}, 5000);
 	};
 
 	createEffect(() => {
@@ -83,7 +89,10 @@ function PresentationNavigation(props: {
 	return (
 		<div class="text-red-500">
 			<div>slide: {props.slide}</div>
-			<Button.Root onclick={showToast}>Toast</Button.Root>
+			<div>{toastShown() ? "toast shown" : "toast not shown"}</div>
+			<Button.Root onclick={() => showToast(props.slide)}>
+				Toast
+			</Button.Root>
 			<Portal>
 				<Toast.Region>
 					<Toast.List class=" fixed top-0 right-0 flex flex-col p-4 gap-2 w-96 max-w-screen-xl m-0 z-[9999] outline-none" />
@@ -92,5 +101,3 @@ function PresentationNavigation(props: {
 		</div>
 	);
 }
-
-export default PresentationNavigation;
