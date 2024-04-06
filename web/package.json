@@ -14,6 +14,7 @@
     "@astrojs/cloudflare": "^9.0.2",
     "@astrojs/solid-js": "^4.0.1",
     "@astrojs/tailwind": "^5.1.0",
+    "@kobalte/core": "^0.12.6",
     "astro": "^4.3.3",
     "drizzle-orm": "^0.29.4",
     "solid-js": "^1.8.14",
