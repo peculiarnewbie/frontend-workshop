@@ -13,16 +13,15 @@ export default {
 				},
 				"sonner-fade-out": {
 					"0%": { opacity: 1, transform: "scale(1)" },
-					"50%": { opacity: 1, transform: "scale(1)" },
 					"100%": {
 						opacity: 0,
-						transform: "scale(0.8) translateY(-100px)",
+						transform: "scale(0.8) ",
 					},
 				},
 			},
 			animation: {
 				"sonner-fade-in": "sonner-fade-in 300ms ease forwards",
-				"sonner-fade-out": "sonner-fade-out 400ms ease forwards",
+				"sonner-fade-out": "sonner-fade-out 200ms ease forwards",
 			},
 		},
 	},
