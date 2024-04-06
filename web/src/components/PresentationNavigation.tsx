@@ -12,7 +12,6 @@ export default function PresentationNavigation(props: {
 }) {
 	let webSocket: WebSocket | null = null;
 	let id: number;
-	let toastTimeout: NodeJS.Timeout | null = null;
 
 	const [toastShown, setToastShown] = createSignal(false);
 
@@ -31,33 +30,31 @@ export default function PresentationNavigation(props: {
 			updateToast(page);
 			return;
 		}
-		setToastShown(true);
 		id = toaster.show((props) => (
 			<NaviagtionToast
 				id={props.toastId}
 				onAction={() => console.log("follow")}
+				onCleanup={closeToast}
 				currentPage={page}
 			/>
 		));
-		toastTimeout = setTimeout(() => {
-			setToastShown(false);
-		}, 5000);
+		setToastShown(true);
 	};
 
 	const updateToast = (page: number) => {
-		if (toastTimeout) {
-			clearTimeout(toastTimeout);
-		}
 		toaster.update(id, (props) => (
 			<NaviagtionToast
 				id={props.toastId}
 				onAction={() => console.log("follow")}
+				onCleanup={closeToast}
 				currentPage={page}
 			/>
 		));
-		toastTimeout = setTimeout(() => {
-			setToastShown(false);
-		}, 5000);
+		setToastShown(true);
+	};
+
+	const closeToast = () => {
+		setToastShown(false);
 	};
 
 	createEffect(() => {

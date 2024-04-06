@@ -1,10 +1,16 @@
 import { Button, Toast } from "@kobalte/core";
+import { onCleanup } from "solid-js";
 
 export default function NaviagtionToast(props: {
 	id: number;
 	currentPage: number;
 	onAction?: () => void;
+	onCleanup?: () => void;
 }) {
+	onCleanup(() => {
+		if (props.onCleanup) props.onCleanup();
+	});
+
 	return (
 		<Toast.Root
 			toastId={props.id}
