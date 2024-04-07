@@ -21,7 +21,7 @@ export default function PresentationNavigation(props: {
 	const followPresenter = (message: { urgency: string; slide: number }) => {
 		if (message.urgency === "now") {
 			moveToPage(message.slide);
-		} else {
+		} else if (!props.isPresenter) {
 			showToast(message.slide);
 		}
 	};
@@ -34,7 +34,7 @@ export default function PresentationNavigation(props: {
 		id = toaster.show((props) => (
 			<NaviagtionToast
 				id={props.toastId}
-				onAction={() => console.log("follow")}
+				onAction={() => moveToPage(page)}
 				onCleanup={closeToast}
 				currentPage={page}
 			/>
@@ -46,7 +46,7 @@ export default function PresentationNavigation(props: {
 		toaster.update(id, (props) => (
 			<NaviagtionToast
 				id={props.toastId}
-				onAction={() => console.log("follow")}
+				onAction={() => moveToPage(page)}
 				onCleanup={closeToast}
 				currentPage={page}
 			/>
