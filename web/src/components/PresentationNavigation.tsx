@@ -1,18 +1,17 @@
 import { Button, Toast, toaster } from "@kobalte/core";
 import { navigate } from "astro/virtual-modules/transitions-router.js";
-import { createEffect, createSignal } from "solid-js";
+import { createEffect, createSignal, onCleanup } from "solid-js";
 import { Portal } from "solid-js/web";
 import NaviagtionToast from "./NaviagtionToast";
 
 const dev = true;
+let webSocket: WebSocket | null = null;
+let id: number;
 
 export default function PresentationNavigation(props: {
 	slide: number;
 	isPresenter: boolean;
 }) {
-	let webSocket: WebSocket | null = null;
-	let id: number;
-
 	const [toastShown, setToastShown] = createSignal(false);
 
 	const moveToPage = (page: number) => {
@@ -22,6 +21,8 @@ export default function PresentationNavigation(props: {
 	const followPresenter = (message: { urgency: string; slide: number }) => {
 		if (message.urgency === "now") {
 			moveToPage(message.slide);
+		} else {
+			showToast(message.slide);
 		}
 	};
 
@@ -57,11 +58,19 @@ export default function PresentationNavigation(props: {
 		setToastShown(false);
 	};
 
+	const sendSlideUpdate = (ws: WebSocket) => {
+		ws.send(JSON.stringify({ type: "slide", slide: props.slide }));
+	};
+
 	createEffect(() => {
-		if (dev) return;
-		if (webSocket) {
-			webSocket.close();
+		if (webSocket && props.isPresenter) {
+			sendSlideUpdate(webSocket);
 		}
+	});
+
+	createEffect(() => {
+		if (dev || webSocket) return;
+		console.log(webSocket);
 		webSocket = new WebSocket(
 			"wss://unity-cf-relay.peculiarnewbie.workers.dev/api/room/hecc/websocket"
 		);
@@ -73,7 +82,7 @@ export default function PresentationNavigation(props: {
 			}
 		};
 		webSocket.onmessage = (event) => {
-			const data = JSON.parse((event.data as string).slice(18));
+			const data = JSON.parse(event.data as string);
 
 			console.log(data);
 
@@ -81,6 +90,11 @@ export default function PresentationNavigation(props: {
 				followPresenter(data);
 			}
 		};
+	});
+
+	onCleanup(() => {
+		setToastShown(false);
+		toaster.clear();
 	});
 
 	return (

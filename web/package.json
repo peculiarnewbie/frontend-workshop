@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@astrojs/check": "^0.4.1",
-    "@astrojs/cloudflare": "^9.0.2",
+    "@astrojs/cloudflare": "10.0.2",
     "@astrojs/solid-js": "^4.0.1",
     "@astrojs/tailwind": "^5.1.0",
     "@kobalte/core": "^0.12.6",
