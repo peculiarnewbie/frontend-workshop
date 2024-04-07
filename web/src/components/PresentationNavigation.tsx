@@ -1,60 +1,92 @@
 import { Button, Toast, toaster } from "@kobalte/core";
 import { navigate } from "astro/virtual-modules/transitions-router.js";
-import { createEffect, createSignal } from "solid-js";
+import { createEffect, createSignal, onCleanup } from "solid-js";
 import { Portal } from "solid-js/web";
+import NaviagtionToast from "./NaviagtionToast";
 
-function PresentationNavigation(props: {
+const wsFlag = false;
+let webSocket: WebSocket | null = null;
+let id: number;
+
+let slideTracker = {
+	presenter: 1,
+	client: 1,
+};
+
+export default function PresentationNavigation(props: {
 	slide: number;
 	isPresenter: boolean;
+	wsUrl: string;
 }) {
-	let webSocket: WebSocket | null = null;
-	let id: number;
-	const dev = true;
+	const [toastShown, setToastShown] = createSignal(false);
 
 	const moveToPage = (page: number) => {
+		slideTracker.client === slideTracker.presenter;
 		navigate(`/slides/${page}`);
 	};
 
 	const followPresenter = (message: { urgency: string; slide: number }) => {
-		if (message.urgency === "now") {
+		if (props.isPresenter) return;
+		const prevPresenter = slideTracker.presenter;
+		slideTracker.presenter = message.slide;
+
+		if (
+			message.urgency === "now" ||
+			prevPresenter === slideTracker.client
+		) {
 			moveToPage(message.slide);
+		} else if (!props.isPresenter) {
+			showToast(message.slide);
 		}
 	};
 
-	const showToast = () => {
+	const showToast = (page: number) => {
+		if (toastShown()) {
+			updateToast(page);
+			return;
+		}
 		id = toaster.show((props) => (
-			<Toast.Root
-				toastId={props.toastId}
-				class="flex flex-col items-center justify-between gap-2 rounded-md p-3 bg-ctp-surface0/50"
-			>
-				<div class="toast__content">
-					<div>
-						<Toast.Title class="toast__title">
-							Event has been created
-						</Toast.Title>
-						<Toast.Description class="toast__description">
-							Monday, January 3rd at 6:00pm
-						</Toast.Description>
-					</div>
-					<Toast.CloseButton class="toast__close-button">
-						x
-					</Toast.CloseButton>
-				</div>
-				<Toast.ProgressTrack class="toast__progress-track">
-					<Toast.ProgressFill class="toast__progress-fill" />
-				</Toast.ProgressTrack>
-			</Toast.Root>
+			<NaviagtionToast
+				id={props.toastId}
+				onAction={() => moveToPage(page)}
+				onCleanup={closeToast}
+				currentPage={page}
+			/>
 		));
+		setToastShown(true);
+	};
+
+	const updateToast = (page: number) => {
+		toaster.update(id, (props) => (
+			<NaviagtionToast
+				id={props.toastId}
+				onAction={() => moveToPage(page)}
+				onCleanup={closeToast}
+				currentPage={page}
+			/>
+		));
+		setToastShown(true);
+	};
+
+	const closeToast = () => {
+		setToastShown(false);
+	};
+
+	const sendSlideUpdate = (ws: WebSocket) => {
+		ws.send(JSON.stringify({ type: "slide", slide: props.slide }));
 	};
 
 	createEffect(() => {
-		if (dev) return;
-		if (webSocket) {
-			webSocket.close();
+		slideTracker.client = props.slide;
+		if (webSocket && props.isPresenter) {
+			sendSlideUpdate(webSocket);
 		}
-		webSocket = new WebSocket(
-			"wss://unity-cf-relay.peculiarnewbie.workers.dev/api/room/hecc/websocket"
-		);
+	});
+
+	createEffect(() => {
+		if (!wsFlag || webSocket) return;
+		console.log(webSocket);
+		webSocket = new WebSocket(props.wsUrl);
 		webSocket.onopen = () => {
 			if (webSocket) {
 				webSocket.send(
@@ -63,7 +95,7 @@ function PresentationNavigation(props: {
 			}
 		};
 		webSocket.onmessage = (event) => {
-			const data = JSON.parse((event.data as string).slice(18));
+			const data = JSON.parse(event.data as string);
 
 			console.log(data);
 
@@ -71,16 +103,22 @@ function PresentationNavigation(props: {
 				followPresenter(data);
 			}
 
-			// if (data.type === "slide") {
-			// 	setPage(data.slide);
-			// }
+			//TODO: after join message update slideTracker.presenter
 		};
+	});
+
+	onCleanup(() => {
+		setToastShown(false);
+		toaster.clear();
 	});
 
 	return (
 		<div class="text-red-500">
 			<div>slide: {props.slide}</div>
-			<Button.Root onclick={showToast}>Toast</Button.Root>
+			<div>{toastShown() ? "toast shown" : "toast not shown"}</div>
+			<Button.Root onclick={() => showToast(props.slide)}>
+				Toast
+			</Button.Root>
 			<Portal>
 				<Toast.Region>
 					<Toast.List class=" fixed top-0 right-0 flex flex-col p-4 gap-2 w-96 max-w-screen-xl m-0 z-[9999] outline-none" />
@@ -89,5 +127,3 @@ function PresentationNavigation(props: {
 		</div>
 	);
 }
-
-export default PresentationNavigation;
