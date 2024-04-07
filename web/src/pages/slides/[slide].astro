@@ -1,19 +1,11 @@
 ---
 import Layout from "../../layouts/Layout.astro";
-import Card from "../../components/Card.astro";
 import PresentationNavigation from "../../components/PresentationNavigation";
-
-// export function getStaticPaths() {
-// 	const slides: { params: { slide: number } }[] = [];
-// 	for (let i = 0; i < 5; i++) {
-// 		slides.push({ params: { slide: i } });
-// 	}
-// 	return slides;
-// }
 
 const { slide } = Astro.params;
 
 const isPresenter = Astro.cookies.get("presenter")?.value === "true" ? true : false;
+const wsUrl = import.meta.env.PUBLIC_WS_URL ?? "wss://localhost:8787/api/room/hecc/websocket"
 ---
 
 <Layout title="Welcome to Astro.">
@@ -24,9 +16,10 @@ const isPresenter = Astro.cookies.get("presenter")?.value === "true" ? true : fa
 		<a href={`/slides/${Number(slide) + 1}`}>next</a>
 		<PresentationNavigation
 		slide={slide ? parseInt(slide) : 1}
+		isPresenter={isPresenter}
+		wsUrl={wsUrl}
 		client:load
 		transition:name="navigation"
-			isPresenter={isPresenter}
 		/>
 	</main
 </Layout>

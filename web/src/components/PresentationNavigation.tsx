@@ -4,22 +4,36 @@ import { createEffect, createSignal, onCleanup } from "solid-js";
 import { Portal } from "solid-js/web";
 import NaviagtionToast from "./NaviagtionToast";
 
-const dev = true;
+const wsFlag = false;
 let webSocket: WebSocket | null = null;
 let id: number;
+
+let slideTracker = {
+	presenter: 1,
+	client: 1,
+};
 
 export default function PresentationNavigation(props: {
 	slide: number;
 	isPresenter: boolean;
+	wsUrl: string;
 }) {
 	const [toastShown, setToastShown] = createSignal(false);
 
 	const moveToPage = (page: number) => {
+		slideTracker.client === slideTracker.presenter;
 		navigate(`/slides/${page}`);
 	};
 
 	const followPresenter = (message: { urgency: string; slide: number }) => {
-		if (message.urgency === "now") {
+		if (props.isPresenter) return;
+		const prevPresenter = slideTracker.presenter;
+		slideTracker.presenter = message.slide;
+
+		if (
+			message.urgency === "now" ||
+			prevPresenter === slideTracker.client
+		) {
 			moveToPage(message.slide);
 		} else if (!props.isPresenter) {
 			showToast(message.slide);
@@ -63,17 +77,16 @@ export default function PresentationNavigation(props: {
 	};
 
 	createEffect(() => {
+		slideTracker.client = props.slide;
 		if (webSocket && props.isPresenter) {
 			sendSlideUpdate(webSocket);
 		}
 	});
 
 	createEffect(() => {
-		if (dev || webSocket) return;
+		if (!wsFlag || webSocket) return;
 		console.log(webSocket);
-		webSocket = new WebSocket(
-			"wss://unity-cf-relay.peculiarnewbie.workers.dev/api/room/hecc/websocket"
-		);
+		webSocket = new WebSocket(props.wsUrl);
 		webSocket.onopen = () => {
 			if (webSocket) {
 				webSocket.send(
@@ -89,6 +102,8 @@ export default function PresentationNavigation(props: {
 			if ("type" in data && data.type === "slide") {
 				followPresenter(data);
 			}
+
+			//TODO: after join message update slideTracker.presenter
 		};
 	});
 
