@@ -31,12 +31,11 @@ export async function GET(context: APIContext): Promise<Response> {
 		const githubUserResponse = await fetch("https://api.github.com/user", {
 			headers: {
 				Authorization: `Bearer ${tokens.accessToken}`,
+				"User-Agent": context.request.headers.get("User-Agent") ?? "",
 			},
 		});
 		console.log("githubUserResponse", await githubUserResponse.text());
-		const githubUser: GitHubUser = JSON.parse(
-			await githubUserResponse.text()
-		);
+		const githubUser: GitHubUser = await githubUserResponse.json();
 		console.log("githubUser", githubUser);
 		const existingUser = await db
 			.select()
