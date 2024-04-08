@@ -25,9 +25,7 @@ export async function GET(context: APIContext): Promise<Response> {
 	}
 
 	try {
-		console.log("code", code);
 		const tokens = await github.validateAuthorizationCode(code);
-		console.log("tokens", tokens);
 		const githubUserResponse = await fetch("https://api.github.com/user", {
 			headers: {
 				Authorization: `Bearer ${tokens.accessToken}`,
@@ -35,18 +33,14 @@ export async function GET(context: APIContext): Promise<Response> {
 			},
 		});
 		const text = await githubUserResponse.text();
-		console.log("githubUserResponse", text);
 		const json = JSON.parse(text);
 		const githubUser: GitHubUser = { id: json.id, login: json.login };
-		console.log("githubUser", githubUser);
 		const existingUser = await db
 			.select()
 			.from(usersTable)
 			.where(eq(usersTable.github_id, githubUser.id));
 
-		console.log("existingUser", existingUser);
-
-		if (existingUser) {
+		if (existingUser.length > 0) {
 			console.log("existingUser", existingUser[0]);
 			const session = await lucia.createSession(existingUser[0].id, {});
 			const sessionCookie = lucia.createSessionCookie(session.id);
