@@ -1,0 +1,7 @@
+name = "frontend-workshop"
+compatibility_date = "2024-04-03"
+
+[[d1_databases]]
+binding = "D1"
+database_name = "prod-frontend-workshop"
+database_id = "f990e63d-7f72-4ce3-81bd-378a3d366df1"
