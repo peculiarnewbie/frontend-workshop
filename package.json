@@ -1,11 +1,8 @@
 {
-  "name": "frontend-workshop",
-  "private": true,
-  "workspaces": [
-    "examples/remix-todo",
-    "web"
-  ],
-  "dependencies": {
-    "js-cookie": "^3.0.5"
-  }
+	"name": "frontend-workshop",
+	"private": true,
+	"workspaces": [
+		"examples/remix-todo",
+		"web"
+	]
 }
