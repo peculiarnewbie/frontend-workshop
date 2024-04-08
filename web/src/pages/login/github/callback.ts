@@ -34,8 +34,10 @@ export async function GET(context: APIContext): Promise<Response> {
 				"User-Agent": context.request.headers.get("User-Agent") ?? "",
 			},
 		});
-		console.log("githubUserResponse", await githubUserResponse.text());
-		const githubUser: GitHubUser = await githubUserResponse.json();
+		const text = await githubUserResponse.text();
+		console.log("githubUserResponse", text);
+		const json = JSON.parse(text);
+		const githubUser: GitHubUser = { id: json.id, login: json.login };
 		console.log("githubUser", githubUser);
 		const existingUser = await db
 			.select()
@@ -81,6 +83,8 @@ export async function GET(context: APIContext): Promise<Response> {
 		}
 		return new Response(null, {
 			status: 500,
+			//@ts-expect-error
+			error: e,
 		});
 	}
 }
