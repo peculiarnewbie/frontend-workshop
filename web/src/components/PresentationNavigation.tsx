@@ -4,7 +4,7 @@ import { createEffect, createSignal, onCleanup } from "solid-js";
 import { Portal } from "solid-js/web";
 import NaviagtionToast from "./NaviagtionToast";
 
-const wsFlag = false;
+// const wsFlag = false;
 let webSocket: WebSocket | null = null;
 let id: number;
 
@@ -17,6 +17,7 @@ export default function PresentationNavigation(props: {
 	slide: number;
 	isPresenter: boolean;
 	wsUrl: string;
+	wsFlag: boolean;
 }) {
 	const [toastShown, setToastShown] = createSignal(false);
 
@@ -77,6 +78,7 @@ export default function PresentationNavigation(props: {
 	};
 
 	createEffect(() => {
+		console.log("bruh come on pls");
 		slideTracker.client = props.slide;
 		if (webSocket && props.isPresenter) {
 			sendSlideUpdate(webSocket);
@@ -84,7 +86,7 @@ export default function PresentationNavigation(props: {
 	});
 
 	createEffect(() => {
-		if (!wsFlag || webSocket) return;
+		if (!props.wsFlag || webSocket) return;
 		console.log(webSocket);
 		webSocket = new WebSocket(props.wsUrl);
 		webSocket.onopen = () => {
