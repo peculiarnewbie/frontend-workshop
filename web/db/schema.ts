@@ -1,15 +1,18 @@
-import { DrizzleSQLiteAdapter } from "@lucia-auth/adapter-drizzle";
-
 import { sqliteTable, text, integer } from "drizzle-orm/sqlite-core";
 
-export const userTable = sqliteTable("user", {
+export const usersTable = sqliteTable("user", {
 	id: text("id").notNull().primaryKey(),
+	github_id: text("github_id").notNull(),
+	username: text("username").notNull(),
 });
 
-export const sessionTable = sqliteTable("session", {
+export const sessionsTable = sqliteTable("session", {
 	id: text("id").notNull().primaryKey(),
 	userId: text("user_id")
 		.notNull()
-		.references(() => userTable.id),
+		.references(() => usersTable.id),
 	expiresAt: integer("expires_at").notNull(),
 });
+
+export type SelectUser = typeof usersTable.$inferSelect;
+export type InsertUser = typeof usersTable.$inferInsert;
