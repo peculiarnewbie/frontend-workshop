@@ -37,7 +37,9 @@ export async function GET(context: APIContext): Promise<Response> {
 			.from(usersTable)
 			.where(eq(usersTable.github_id, githubUser.id));
 
-		if (existingUser) {
+		console.log(existingUser);
+
+		if (existingUser[0]) {
 			const session = await lucia.createSession(existingUser[0].id, {});
 			const sessionCookie = lucia.createSessionCookie(session.id);
 			context.cookies.set(
