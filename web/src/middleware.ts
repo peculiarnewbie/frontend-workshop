@@ -1,8 +1,10 @@
-import { lucia } from "./auth";
 import { verifyRequestOrigin } from "lucia";
 import { defineMiddleware } from "astro:middleware";
+import { getLuciaFromD1 } from "./lib/auth";
+import type { APIContext } from "astro";
 
-export const onRequest = defineMiddleware(async (context, next) => {
+export const onRequest = defineMiddleware(async (context: APIContext, next) => {
+	const { lucia } = getLuciaFromD1(context.locals.runtime.env.D1);
 	if (context.request.method !== "GET") {
 		const originHeader = context.request.headers.get("Origin");
 		const hostHeader = context.request.headers.get("Host");
@@ -16,7 +18,6 @@ export const onRequest = defineMiddleware(async (context, next) => {
 			});
 		}
 	}
-
 	const sessionId =
 		context.cookies.get(lucia.sessionCookieName)?.value ?? null;
 	if (!sessionId) {
@@ -24,7 +25,6 @@ export const onRequest = defineMiddleware(async (context, next) => {
 		context.locals.session = null;
 		return next();
 	}
-
 	const { session, user } = await lucia.validateSession(sessionId);
 	if (session && session.fresh) {
 		const sessionCookie = lucia.createSessionCookie(session.id);
