@@ -1,4 +1,4 @@
-import { getLuciaFromD1, github } from "../../../lib/auth";
+import { getGithub, getLuciaFromD1 } from "../../../lib/auth";
 import { OAuth2RequestError } from "arctic";
 import { generateId } from "lucia";
 
@@ -9,6 +9,10 @@ import { eq } from "drizzle-orm";
 
 export async function GET(context: APIContext): Promise<Response> {
 	const { db, lucia } = getLuciaFromD1(context.locals.runtime.env.D1);
+	const github = getGithub(
+		context.locals.runtime.env.GITHUB_CLIENT_ID,
+		context.locals.runtime.env.GITHUB_CLIENT_SECRET
+	);
 
 	const code = context.url.searchParams.get("code");
 	const state = context.url.searchParams.get("state");

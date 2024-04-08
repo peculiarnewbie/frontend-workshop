@@ -47,7 +47,8 @@ interface DatabaseUserAttributes {
 	username: string;
 }
 
-export const github = new GitHub(
-	import.meta.env.GITHUB_CLIENT_ID,
-	import.meta.env.GITHUB_CLIENT_SECRET
-);
+export const getGithub = (id: string, secret: string) => new GitHub(id, secret);
+// export const github = new GitHub(
+// 	import.meta.env.GITHUB_CLIENT_ID,
+// 	import.meta.env.GITHUB_CLIENT_SECRET
+// );

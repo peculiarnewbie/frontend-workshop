@@ -1,10 +1,14 @@
 import { generateState } from "arctic";
-import { github } from "../../../lib/auth";
+import { getGithub } from "../../../lib/auth";
 
 import type { APIContext } from "astro";
 
 export async function GET(context: APIContext): Promise<Response> {
 	const state = generateState();
+	const github = getGithub(
+		context.locals.runtime.env.GITHUB_CLIENT_ID,
+		context.locals.runtime.env.GITHUB_CLIENT_SECRET
+	);
 	const url = await github.createAuthorizationURL(state);
 
 	context.cookies.set("github_oauth_state", state, {
