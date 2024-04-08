@@ -25,46 +25,46 @@ export async function GET(context: APIContext): Promise<Response> {
 	}
 
 	try {
-		const tokens = await github.validateAuthorizationCode(code);
-		const githubUserResponse = await fetch("https://api.github.com/user", {
-			headers: {
-				Authorization: `Bearer ${tokens.accessToken}`,
-			},
-		});
-		const githubUser: GitHubUser = await githubUserResponse.json();
-		return context.redirect(`/${githubUser.login}`);
-		const existingUser = await db
-			.select()
-			.from(usersTable)
-			.where(eq(usersTable.github_id, githubUser.id));
+		return context.redirect(`/${code}`);
+		// const tokens = await github.validateAuthorizationCode(code);
+		// const githubUserResponse = await fetch("https://api.github.com/user", {
+		// 	headers: {
+		// 		Authorization: `Bearer ${tokens.accessToken}`,
+		// 	},
+		// });
+		// const githubUser: GitHubUser = await githubUserResponse.json();
+		// const existingUser = await db
+		// 	.select()
+		// 	.from(usersTable)
+		// 	.where(eq(usersTable.github_id, githubUser.id));
 
-		console.log(existingUser);
+		// console.log(existingUser);
 
-		if (existingUser[0].id) {
-			const session = await lucia.createSession(existingUser[0].id, {});
-			const sessionCookie = lucia.createSessionCookie(session.id);
-			context.cookies.set(
-				sessionCookie.name,
-				sessionCookie.value,
-				sessionCookie.attributes
-			);
-			return context.redirect("/");
-		}
+		// if (existingUser[0].id) {
+		// 	const session = await lucia.createSession(existingUser[0].id, {});
+		// 	const sessionCookie = lucia.createSessionCookie(session.id);
+		// 	context.cookies.set(
+		// 		sessionCookie.name,
+		// 		sessionCookie.value,
+		// 		sessionCookie.attributes
+		// 	);
+		// 	return context.redirect("/");
+		// }
 
-		const userId = generateId(15);
-		await db.insert(usersTable).values({
-			id: userId,
-			github_id: githubUser.id,
-			username: githubUser.login,
-		});
-		const session = await lucia.createSession(userId, {});
-		const sessionCookie = lucia.createSessionCookie(session.id);
-		context.cookies.set(
-			sessionCookie.name,
-			sessionCookie.value,
-			sessionCookie.attributes
-		);
-		return context.redirect("/");
+		// const userId = generateId(15);
+		// await db.insert(usersTable).values({
+		// 	id: userId,
+		// 	github_id: githubUser.id,
+		// 	username: githubUser.login,
+		// });
+		// const session = await lucia.createSession(userId, {});
+		// const sessionCookie = lucia.createSessionCookie(session.id);
+		// context.cookies.set(
+		// 	sessionCookie.name,
+		// 	sessionCookie.value,
+		// 	sessionCookie.attributes
+		// );
+		// return context.redirect("/");
 	} catch (e) {
 		if (
 			e instanceof OAuth2RequestError &&
