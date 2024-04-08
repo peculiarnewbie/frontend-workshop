@@ -33,7 +33,12 @@ export async function GET(context: APIContext): Promise<Response> {
 				Authorization: `Bearer ${tokens.accessToken}`,
 			},
 		});
-		const githubUser: GitHubUser = await githubUserResponse.json();
+		console.log("githubUser", githubUserResponse.body);
+		const { id, login } = (await githubUserResponse.json()) as {
+			id: string;
+			login: string;
+		};
+		const githubUser: GitHubUser = { id: id, login: login };
 		console.log("githubUser", githubUser);
 		const existingUser = await db
 			.select()
