@@ -18,7 +18,7 @@ const wsUrl = import.meta.env.PUBLIC_WS_URL ?? "wss://localhost:8787/api/room/he
 		slide={slide ? parseInt(slide) : 1}
 		isPresenter={isPresenter}
 		wsUrl={wsUrl}
-		client:load
+		client:only="solid-js"
 		transition:name="navigation"
 		/>
 	</main
