@@ -7,6 +7,7 @@
 		"start": "astro dev",
 		"build": "astro check && astro build",
 		"preview": "astro check && astro build && wrangler pages dev ./dist",
+
 		"astro": "astro"
 	},
 	"dependencies": {
@@ -26,8 +27,7 @@
 	},
 	"devDependencies": {
 		"@catppuccin/tailwindcss": "^0.1.6",
-		"@lucia-auth/adapter-drizzle": "^1.0.7",
 		"drizzle-kit": "^0.20.14",
-		"wrangler": "^3.48.0"
+		"@lucia-auth/adapter-drizzle": "^1.0.7"
 	}
 }

@@ -9,4 +9,5 @@ export default defineConfig({
 	output: "server",
 	adapter: cloudflare(),
 	integrations: [solidJs(), tailwind({ applyBaseStyles: true })],
+
 });
