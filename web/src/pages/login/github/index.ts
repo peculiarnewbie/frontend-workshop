@@ -6,8 +6,8 @@ import type { APIContext } from "astro";
 export async function GET(context: APIContext): Promise<Response> {
 	const state = generateState();
 	const github = getGithub(
-		import.meta.env.GITHUB_CLIENT_ID,
-		import.meta.env.GITHUB_CLIENT_SECRET
+		context.locals.runtime.env.GITHUB_CLIENT_ID,
+		context.locals.runtime.env.GITHUB_CLIENT_SECRET
 	);
 	const url = await github.createAuthorizationURL(state);
 

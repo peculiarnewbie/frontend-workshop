@@ -10,8 +10,8 @@ import { eq } from "drizzle-orm";
 export async function GET(context: APIContext): Promise<Response> {
 	const { db, lucia } = getLuciaFromD1(context.locals.runtime.env.D1);
 	const github = getGithub(
-		import.meta.env.GITHUB_CLIENT_ID,
-		import.meta.env.GITHUB_CLIENT_SECRET
+		context.locals.runtime.env.GITHUB_CLIENT_ID,
+		context.locals.runtime.env.GITHUB_CLIENT_SECRET
 	);
 
 	const code = context.url.searchParams.get("code");
