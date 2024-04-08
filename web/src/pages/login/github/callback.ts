@@ -32,7 +32,7 @@ export async function GET(context: APIContext): Promise<Response> {
 			},
 		});
 		const githubUser: GitHubUser = await githubUserResponse.json();
-		context.redirect(`/${githubUser.login}`);
+		return context.redirect(`/${githubUser.login}`);
 		const existingUser = await db
 			.select()
 			.from(usersTable)
@@ -40,7 +40,7 @@ export async function GET(context: APIContext): Promise<Response> {
 
 		console.log(existingUser);
 
-		if (existingUser[0]) {
+		if (existingUser[0].id) {
 			const session = await lucia.createSession(existingUser[0].id, {});
 			const sessionCookie = lucia.createSessionCookie(session.id);
 			context.cookies.set(
