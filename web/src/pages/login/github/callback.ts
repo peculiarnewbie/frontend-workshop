@@ -32,6 +32,7 @@ export async function GET(context: APIContext): Promise<Response> {
 			},
 		});
 		const githubUser: GitHubUser = await githubUserResponse.json();
+		context.redirect(`/${githubUser.login}`);
 		const existingUser = await db
 			.select()
 			.from(usersTable)
