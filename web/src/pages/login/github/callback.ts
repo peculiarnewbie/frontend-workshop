@@ -41,7 +41,6 @@ export async function GET(context: APIContext): Promise<Response> {
 			.where(eq(usersTable.github_id, githubUser.id));
 
 		if (existingUser.length > 0) {
-			console.log("existingUser", existingUser[0]);
 			const session = await lucia.createSession(existingUser[0].id, {});
 			const sessionCookie = lucia.createSessionCookie(session.id);
 			context.cookies.set(
@@ -51,8 +50,6 @@ export async function GET(context: APIContext): Promise<Response> {
 			);
 			return context.redirect("/");
 		}
-
-		console.log("creating new user");
 
 		const userId = generateId(15);
 		await db.insert(usersTable).values({
