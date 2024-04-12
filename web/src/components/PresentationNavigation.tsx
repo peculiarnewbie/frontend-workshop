@@ -2,7 +2,7 @@ import { Button, Toast, toaster } from "@kobalte/core";
 import { navigate } from "astro/virtual-modules/transitions-router.js";
 import { createEffect, createSignal, onCleanup } from "solid-js";
 import { Portal } from "solid-js/web";
-import NaviagtionToast from "./NaviagtionToast";
+import NavigationToast from "./NavigationToast";
 
 // const wsFlag = false;
 let webSocket: WebSocket | null = null;
@@ -22,10 +22,10 @@ export default function PresentationNavigation(props: {
 	const [toastShown, setToastShown] = createSignal(false);
 
 	const moveToPage = (page: number) => {
-		slideTracker.client === slideTracker.presenter;
 		navigate(`/slides/${page}`);
 	};
 
+	// weird name this
 	const followPresenter = (message: { urgency: string; slide: number }) => {
 		if (props.isPresenter) return;
 		const prevPresenter = slideTracker.presenter;
@@ -47,7 +47,7 @@ export default function PresentationNavigation(props: {
 			return;
 		}
 		id = toaster.show((props) => (
-			<NaviagtionToast
+			<NavigationToast
 				id={props.toastId}
 				onAction={() => moveToPage(page)}
 				onCleanup={closeToast}
@@ -59,7 +59,7 @@ export default function PresentationNavigation(props: {
 
 	const updateToast = (page: number) => {
 		toaster.update(id, (props) => (
-			<NaviagtionToast
+			<NavigationToast
 				id={props.toastId}
 				onAction={() => moveToPage(page)}
 				onCleanup={closeToast}
@@ -118,9 +118,14 @@ export default function PresentationNavigation(props: {
 		<div class="text-red-500">
 			<div>slide: {props.slide}</div>
 			<div>{toastShown() ? "toast shown" : "toast not shown"}</div>
-			<Button.Root onclick={() => showToast(props.slide)}>
-				Toast
-			</Button.Root>
+			<div class="flex flex-col gap-2">
+				<Button.Root onclick={() => showToast(props.slide)}>
+					Toast
+				</Button.Root>
+				<Button.Root onclick={() => moveToPage(slideTracker.presenter)}>
+					Follow Presenter
+				</Button.Root>
+			</div>
 			<Portal>
 				<Toast.Region>
 					<Toast.List class=" fixed top-0 right-0 flex flex-col p-4 gap-2 w-96 max-w-screen-xl m-0 z-[9999] outline-none" />

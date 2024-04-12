@@ -1,7 +1,7 @@
 import { Button, Toast } from "@kobalte/core";
 import { onCleanup } from "solid-js";
 
-export default function NaviagtionToast(props: {
+export default function NavigationToast(props: {
 	id: number;
 	currentPage: number;
 	onAction?: () => void;
