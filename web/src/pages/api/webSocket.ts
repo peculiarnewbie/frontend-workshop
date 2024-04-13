@@ -8,7 +8,7 @@ export async function GET(context: APIContext) {
 	// const db = drizzle(runtime.env.D1);
 
 	// const data = await db.select().from(sessionsTable);
-	// return Response.json(data);
+	// return Response.json(data) bump;
 
 	return Response.json({ hello: "world" });
 }
