@@ -16,8 +16,6 @@
 		"@astrojs/solid-js": "^4.0.1",
 		"@astrojs/tailwind": "^5.1.0",
 		"@kobalte/core": "^0.12.6",
-		"@lucia-auth/adapter-drizzle": "^1.0.7",
-		"@lucia-auth/adapter-sqlite": "^3.0.1",
 		"@types/js-cookie": "^3.0.6",
 		"arctic": "^1.5.0",
 		"astro": "^4.5.16",
