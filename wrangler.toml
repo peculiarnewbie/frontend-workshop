@@ -16,6 +16,7 @@ compatibility_date = "2024-04-07"
 
 [env.production.vars]
 PUBLIC_WS_URL = "wss://unity-cf-relay.peculiarnewbie.workers.dev/api/room/hecc/websocket"
+BUN_VERSION = "1.1.1"
 
 [[env.production.d1_databases]]
 database_id = "f990e63d-7f72-4ce3-81bd-378a3d366df1"
