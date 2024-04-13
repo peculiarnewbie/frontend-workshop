@@ -4,6 +4,9 @@ import { getLuciaFromD1 } from "./lib/auth";
 import type { APIContext } from "astro";
 
 export const onRequest = defineMiddleware(async (context: APIContext, next) => {
+	if (import.meta.env.MIDDLEWARE_FLAG === "false") {
+		return next();
+	}
 	const { lucia } = getLuciaFromD1(context.locals.runtime.env.D1);
 	if (context.request.method !== "GET") {
 		const originHeader = context.request.headers.get("Origin");
