@@ -6,7 +6,7 @@ const { slide } = Astro.params;
 
 const isPresenter = Astro.cookies.get("presenter")?.value === "true" ? true : false;
 const url = new URL(Astro.url);
-const wsUrl = `wss://${url.host}/api/rooms/hey/websocket`;
+const wsUrl = `wss://${url.host}/api/room/hey/websocket`;
 const wsFlag = import.meta.env.WS_FLAG === "false" ? false : true;
 ---
 
