@@ -105,14 +105,7 @@ async function handleApiRequest(name: string, request: Request, env: ENV) {
 		return new Response("Name too long", { status: 404 });
 	}
 
-	console.log("id", id);
-
 	let roomObject = env.DO.get(id);
-
-	console.log("roomObject", JSON.stringify(roomObject), roomObject.id);
-
-	const url = new URL(request.url);
-	console.log("url", url);
 
 	return await roomObject.fetch(request);
 }

@@ -1,8 +1,9 @@
 {
-  "name": "frontend-workshop",
-  "private": true,
-  "workspaces": [
-    "examples/remix-todo",
-    "web"
-  ]
+	"name": "frontend-workshop",
+	"private": true,
+	"workspaces": [
+		"packages/web",
+		"packages/examples/remix-todo",
+		"packages/DO"
+	]
 }

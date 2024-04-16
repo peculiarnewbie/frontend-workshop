@@ -1,0 +1,12 @@
+name = "frontend-do"
+compatibility_date = "2024-01-01"
+
+main = "./main.ts"
+
+[[durable_objects.bindings]]
+name = "Rooms"
+class_name = "Rooms"
+
+[[migrations]]
+tag = "v1"
+new_classes = ["Rooms"]
