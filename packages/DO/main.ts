@@ -72,12 +72,19 @@ export class Rooms {
 
 			this.state.acceptWebSocket(server);
 
+			let body = "you are a watcher";
+
+			if (this.state.getWebSockets().length == 1) {
+				body = "you are the presenter";
+			}
+
 			const response: ResponseInit = {
 				status: 101,
 				webSocket: client as CloudflareWebsocket,
 			};
 
-			return new Response(null, response);
+			//@ts-expect-error
+			return new Response(body, response);
 		} else if (procedure == "getCurrentConnections") {
 			// Retrieves all currently connected websockets accepted via `acceptWebSocket()`.
 			let numConnections: number = this.state.getWebSockets().length;
