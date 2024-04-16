@@ -4,6 +4,7 @@ import PresentationNavigation from "../../components/PresentationNavigation";
 
 const { slide } = Astro.params;
 
+// TODO use auth instead
 const isPresenter = Astro.cookies.get("presenter")?.value === "true" ? true : false;
 const url = new URL(Astro.url);
 const wsUrl = `wss://${url.host}/api/room/hey/websocket`;

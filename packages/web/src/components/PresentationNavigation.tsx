@@ -100,8 +100,20 @@ export default function PresentationNavigation(props: {
 
 			console.log(data);
 
-			if ("type" in data && data.type === "slide") {
-				followPresenter(data);
+			if ("type" in data) {
+				if (data.type === "slide") followPresenter(data);
+				else if (data.type === "update") {
+					slideTracker.presenter = data.slide;
+					console.log("updated", data.slide);
+				} else if (data.type === "join") {
+					if (props.isPresenter)
+						webSocket?.send(
+							JSON.stringify({
+								type: "update",
+								slide: props.slide,
+							})
+						);
+				}
 			}
 
 			//TODO: after join message update slideTracker.presenter
