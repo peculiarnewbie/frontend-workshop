@@ -80,12 +80,17 @@ export async function GET(context: APIContext) {
 
 		console.log("name", name, "procedure", procedure);
 
-		return await handleApiRequest(
-			name ?? "hey",
-			procedure ?? "websocket",
-			context.request,
-			context.locals.runtime.env
-		);
+		try {
+			return await handleApiRequest(
+				name ?? "hey",
+				procedure ?? "websocket",
+				context.request,
+				context.locals.runtime.env
+			);
+		} catch (err) {
+			console.error(err);
+			return new Response("fails", { status: 500 });
+		}
 	});
 }
 
@@ -106,7 +111,11 @@ async function handleApiRequest(
 		return new Response("Name too long", { status: 404 });
 	}
 
+	console.log("id", id);
+
 	let roomObject = env.DO.get(id);
+
+	console.log("roomObject", roomObject);
 
 	return await roomObject.fetch(procedure, request);
 }
