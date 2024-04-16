@@ -10,6 +10,7 @@ let id: number;
 
 let slideTracker = {
 	presenter: 1,
+	client: 1,
 };
 
 export default function PresentationNavigation(props: {
@@ -30,7 +31,10 @@ export default function PresentationNavigation(props: {
 		const prevPresenter = slideTracker.presenter;
 		slideTracker.presenter = message.slide;
 
-		if (message.urgency === "now" || prevPresenter === props.slide) {
+		if (
+			message.urgency === "now" ||
+			prevPresenter === slideTracker.client
+		) {
 			moveToPage(message.slide);
 		} else if (!props.isPresenter) {
 			showToast(message.slide);
@@ -69,13 +73,12 @@ export default function PresentationNavigation(props: {
 		setToastShown(false);
 	};
 
-	const sendSlideUpdate = (ws: WebSocket, fromJoined?: boolean) => {
-		if (fromJoined)
-			ws.send(JSON.stringify({ type: "update", slide: props.slide }));
-		else ws.send(JSON.stringify({ type: "slide", slide: props.slide }));
+	const sendSlideUpdate = (ws: WebSocket) => {
+		ws.send(JSON.stringify({ type: "slide", slide: props.slide }));
 	};
 
 	createEffect(() => {
+		slideTracker.client = props.slide;
 		if (webSocket && props.isPresenter) {
 			sendSlideUpdate(webSocket);
 		}
@@ -101,10 +104,15 @@ export default function PresentationNavigation(props: {
 				if (data.type === "slide") followPresenter(data);
 				else if (data.type === "update") {
 					slideTracker.presenter = data.slide;
-					console.log("updated", data.slide, props.slide);
+					console.log("updated", data.slide);
 				} else if (data.type === "join") {
 					if (props.isPresenter)
-						if (webSocket) sendSlideUpdate(webSocket, true);
+						webSocket?.send(
+							JSON.stringify({
+								type: "update",
+								slide: props.slide,
+							})
+						);
 				}
 			}
 
