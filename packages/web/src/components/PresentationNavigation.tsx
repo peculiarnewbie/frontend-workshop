@@ -81,6 +81,7 @@ export default function PresentationNavigation(props: {
 		slideTracker.client = props.slide;
 		if (webSocket && props.isPresenter) {
 			sendSlideUpdate(webSocket);
+			slideTracker.presenter = props.slide;
 		}
 	});
 
@@ -106,13 +107,15 @@ export default function PresentationNavigation(props: {
 					slideTracker.presenter = data.slide;
 					console.log("updated", data.slide);
 				} else if (data.type === "join") {
-					if (props.isPresenter)
+					if (props.isPresenter) {
+						console.log("sending update", slideTracker.presenter);
 						webSocket?.send(
 							JSON.stringify({
 								type: "update",
-								slide: props.slide,
+								slide: slideTracker.presenter,
 							})
 						);
+					}
 				}
 			}
 
