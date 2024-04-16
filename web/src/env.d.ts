@@ -4,6 +4,7 @@ type D1Namespace = import("@cloudflare/workers-types/experimental").D1Database;
 type ENV = {
 	SERVER_URL: string;
 	D1: D1Namespace;
+	DO: DurableObjectNamespace;
 	GITHUB_CLIENT_ID: string;
 	GITHUB_CLIENT_SECRET: string;
 };
