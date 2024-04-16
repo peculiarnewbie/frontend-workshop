@@ -1,6 +1,7 @@
 import {
 	type DurableObjectNamespace,
 	type DurableObjectState,
+	type WebSocket as WS,
 } from "@cloudflare/workers-types";
 
 interface CloudflareWebsocket {
@@ -26,10 +27,10 @@ interface CloudflareWebsocket {
 	send(message: string | Uint8Array): unknown;
 }
 
-class WebSocketPair {
-	0: CloudflareWebsocket & WebSocket; // Client
-	1: CloudflareWebsocket & WebSocket; // Server
-}
+// class WebSocketPair {
+// 	0: CloudflareWebsocket;
+// 	1: CloudflareWebsocket;
+// }
 
 interface ResponseInit {
 	status?: number;
@@ -70,11 +71,28 @@ export class Rooms {
 			const webSocketPair = new WebSocketPair();
 			const [client, server] = Object.values(webSocketPair);
 
-			this.state.acceptWebSocket(server);
+			const connectionsCount = this.state.getWebSockets().length;
 
-			const response: ResponseInit = {
+			// TODO use auth instead
+			if (connectionsCount === 1) {
+				this.state.acceptWebSocket(server as unknown as WS, [
+					"presenter",
+				]);
+			} else {
+				this.state.acceptWebSocket(server as unknown as WS);
+				this.state.getWebSockets().forEach((ws) => {
+					ws.send(
+						JSON.stringify({
+							type: "join",
+							connectionsCount: connectionsCount,
+						})
+					);
+				});
+			}
+
+			const response = {
 				status: 101,
-				webSocket: client as CloudflareWebsocket,
+				webSocket: client,
 			};
 
 			return new Response(null, response);
@@ -102,11 +120,11 @@ This Durable Object supports the following endpoints:
 	}
 
 	async webSocketMessage(ws: WebSocket, message: ArrayBuffer | string) {
-		// Upon receiving a message from the client, reply with the same message,
-		// but will prefix the message with "[Durable Object]: ".
-		this.state.getWebSockets().forEach((ws) => {
-			ws.send(message);
-		});
+		if (this.state.getTags(ws as unknown as WS).includes("presenter")) {
+			this.state.getWebSockets().forEach((ws) => {
+				ws.send(message);
+			});
+		}
 	}
 
 	async webSocketClose(
