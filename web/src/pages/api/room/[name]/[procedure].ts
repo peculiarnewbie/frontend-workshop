@@ -115,7 +115,7 @@ async function handleApiRequest(
 
 	let roomObject = env.DO.get(id);
 
-	console.log("roomObject", roomObject);
+	console.log("roomObject", JSON.stringify(roomObject));
 
 	return await roomObject.fetch(procedure, request);
 }
