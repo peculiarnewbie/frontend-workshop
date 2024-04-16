@@ -3,7 +3,6 @@
 	"private": true,
 	"workspaces": [
 		"packages/web",
-		"packages/examples/remix-todo",
-		"packages/DO"
+		"packages/examples/remix-todo"
 	]
 }
