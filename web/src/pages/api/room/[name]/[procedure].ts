@@ -83,7 +83,6 @@ export async function GET(context: APIContext) {
 		try {
 			return await handleApiRequest(
 				name ?? "hey",
-				procedure ?? "websocket",
 				context.request,
 				context.locals.runtime.env
 			);
@@ -94,12 +93,7 @@ export async function GET(context: APIContext) {
 	});
 }
 
-async function handleApiRequest(
-	name: string,
-	procedure: string,
-	request: Request,
-	env: ENV
-) {
+async function handleApiRequest(name: string, request: Request, env: ENV) {
 	// We've received at API request. Route the request based on the path.
 
 	let id;
@@ -115,9 +109,12 @@ async function handleApiRequest(
 
 	let roomObject = env.DO.get(id);
 
-	console.log("roomObject", JSON.stringify(roomObject));
+	console.log("roomObject", JSON.stringify(roomObject), roomObject.id);
 
-	return await roomObject.fetch(procedure, request);
+	const url = new URL(request.url);
+	console.log("url", url);
+
+	return await roomObject.fetch(request);
 }
 
 // Durable Object
