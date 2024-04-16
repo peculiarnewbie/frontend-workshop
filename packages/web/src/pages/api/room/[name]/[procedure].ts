@@ -78,8 +78,6 @@ export async function GET(context: APIContext) {
 
 		const { name, procedure } = context.params;
 
-		console.log("name", name, "procedure", procedure);
-
 		try {
 			return await handleApiRequest(
 				name ?? "hey",

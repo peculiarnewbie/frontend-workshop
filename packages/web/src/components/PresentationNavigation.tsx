@@ -78,7 +78,6 @@ export default function PresentationNavigation(props: {
 	};
 
 	createEffect(() => {
-		console.log("bruh come on pls");
 		slideTracker.client = props.slide;
 		if (webSocket && props.isPresenter) {
 			sendSlideUpdate(webSocket);
@@ -89,13 +88,13 @@ export default function PresentationNavigation(props: {
 		if (!props.wsFlag || webSocket) return;
 		console.log(webSocket);
 		webSocket = new WebSocket(props.wsUrl);
-		webSocket.onopen = () => {
-			if (webSocket) {
-				webSocket.send(
-					JSON.stringify({ type: "join", slide: props.slide })
-				);
-			}
-		};
+		// webSocket.onopen = () => {
+		// 	if (webSocket) {
+		// 		webSocket.send(
+		// 			JSON.stringify({ type: "join", slide: props.slide })
+		// 		);
+		// 	}
+		// };
 		webSocket.onmessage = (event) => {
 			const data = JSON.parse(event.data as string);
 

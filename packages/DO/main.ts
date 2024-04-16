@@ -71,13 +71,24 @@ export class Rooms {
 			const webSocketPair = new WebSocketPair();
 			const [client, server] = Object.values(webSocketPair);
 
-			this.state.acceptWebSocket(server as unknown as WS);
+			const connectionsCount = this.state.getWebSockets().length;
 
-			// let body = "you are a watcher";
-
-			// if (this.state.getWebSockets().length == 1) {
-			// 	body = "you are the presenter";
-			// }
+			// TODO use auth instead
+			if (connectionsCount === 1) {
+				this.state.acceptWebSocket(server as unknown as WS, [
+					"presenter",
+				]);
+			} else {
+				this.state.acceptWebSocket(server as unknown as WS);
+				this.state.getWebSockets().forEach((ws) => {
+					ws.send(
+						JSON.stringify({
+							type: "join",
+							connectionsCount: connectionsCount,
+						})
+					);
+				});
+			}
 
 			const response = {
 				status: 101,
@@ -109,11 +120,11 @@ This Durable Object supports the following endpoints:
 	}
 
 	async webSocketMessage(ws: WebSocket, message: ArrayBuffer | string) {
-		// Upon receiving a message from the client, reply with the same message,
-		// but will prefix the message with "[Durable Object]: ".
-		this.state.getWebSockets().forEach((ws) => {
-			ws.send(message);
-		});
+		if (this.state.getTags(ws as unknown as WS).includes("presenter")) {
+			this.state.getWebSockets().forEach((ws) => {
+				ws.send(message);
+			});
+		}
 	}
 
 	async webSocketClose(
