@@ -1,6 +1,7 @@
 import {
 	type DurableObjectNamespace,
 	type DurableObjectState,
+	type WebSocket as WS,
 } from "@cloudflare/workers-types";
 
 interface CloudflareWebsocket {
@@ -26,10 +27,10 @@ interface CloudflareWebsocket {
 	send(message: string | Uint8Array): unknown;
 }
 
-class WebSocketPair {
-	0: CloudflareWebsocket & WebSocket; // Client
-	1: CloudflareWebsocket & WebSocket; // Server
-}
+// class WebSocketPair {
+// 	0: CloudflareWebsocket;
+// 	1: CloudflareWebsocket;
+// }
 
 interface ResponseInit {
 	status?: number;
@@ -70,21 +71,20 @@ export class Rooms {
 			const webSocketPair = new WebSocketPair();
 			const [client, server] = Object.values(webSocketPair);
 
-			this.state.acceptWebSocket(server);
+			this.state.acceptWebSocket(server as unknown as WS);
 
-			let body = "you are a watcher";
+			// let body = "you are a watcher";
 
-			if (this.state.getWebSockets().length == 1) {
-				body = "you are the presenter";
-			}
+			// if (this.state.getWebSockets().length == 1) {
+			// 	body = "you are the presenter";
+			// }
 
-			const response: ResponseInit = {
+			const response = {
 				status: 101,
-				webSocket: client as CloudflareWebsocket,
+				webSocket: client,
 			};
 
-			//@ts-expect-error
-			return new Response(body, response);
+			return new Response(null, response);
 		} else if (procedure == "getCurrentConnections") {
 			// Retrieves all currently connected websockets accepted via `acceptWebSocket()`.
 			let numConnections: number = this.state.getWebSockets().length;
